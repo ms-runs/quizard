@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz nights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&family=Poiret+One&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A1E;--s1:#11112B;--gold:#D4AF37;--gold-hi:#E6C65A;--ivory:#F2EDDC;--iv2:rgba(242,237,220,.80);--iv3:rgba(242,237,220,.68);--line:rgba(212,175,55,.34);--line2:rgba(212,175,55,.16);--bad:#E58C7C;--ease:cubic-bezier(.22,.8,.24,1);--f-d:"Poiret One","Jost",serif;--f-b:"Jost",system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ivory);font:400 16px/1.5 var(--f-b);-webkit-font-smoothing:antialiased}
+button,input,a{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+a{text-decoration:none}
+.wrap{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(32px,6vw,96px);padding:clamp(24px,5vw,72px);align-content:start}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}}
+.intro{display:flex;flex-direction:column;gap:clamp(16px,2vw,28px);padding-top:clamp(0px,4vw,56px)}
+.mark{font-family:var(--f-d);font-size:clamp(52px,8vw,120px);line-height:.95;margin:0;font-weight:400}
+.lede{font-size:clamp(18px,1.8vw,24px);color:var(--iv2);max-width:30ch;margin:0}
+.join{margin-top:clamp(8px,2vw,28px);position:relative;border:1px solid var(--line);background:var(--s1);padding:clamp(18px,2vw,28px);max-width:420px}
+.join::before{content:"";position:absolute;inset:6px;border:1px solid var(--line2);pointer-events:none}
+.join h2{margin:0 0 4px;font-size:18px;font-weight:500;position:relative}
+.join p{margin:0 0 14px;color:var(--iv3);font-size:15px;position:relative}
+.join form{display:flex;gap:8px;position:relative}
+.code{flex:1;min-width:0;min-height:48px;padding:0 14px;background:var(--bg);border:1px solid var(--line);border-radius:2px;font-size:22px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;font-variant-numeric:tabular-nums}
+.code::placeholder{color:var(--iv3);letter-spacing:.12em}
+.code:hover{border-color:rgba(212,175,55,.6)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border:1px solid var(--line);background:transparent;cursor:pointer;border-radius:2px;font-weight:500;transition:background .15s var(--ease),border-color .15s var(--ease)}
+.btn:hover:not(:disabled){border-color:var(--gold);background:rgba(212,175,55,.08)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.pri{background:var(--gold);border-color:var(--gold);color:#14110a}
+.btn.pri:hover:not(:disabled){background:var(--gold-hi);border-color:var(--gold-hi)}
+.err{color:var(--bad);font-size:14px;min-height:20px;margin-top:8px;position:relative}
+.list{padding-top:clamp(0px,4vw,56px)}
+.list h2{margin:0 0 12px;font-size:18px;font-weight:500;color:var(--gold)}
+.quiz{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:center;padding:clamp(18px,2vw,28px) 0;border-top:1px solid var(--line)}
+.quiz:last-child{border-bottom:1px solid var(--line)}
+.quiz h3{margin:0;font-size:clamp(22px,2.4vw,30px);font-weight:400}
+.quiz p{margin:4px 0 0;color:var(--iv2);max-width:46ch}
+.quiz small{display:block;color:var(--iv3);margin-top:6px;font-size:14px}
+.soon{color:var(--iv3);font-size:14px}
+@media (max-width:520px){.quiz{grid-template-columns:1fr}}
+.skeleton{height:14px;background:linear-gradient(90deg,#1A1A3A,#232348,#1A1A3A);background-size:200% 100%;animation:sh 1.2s linear infinite;border-radius:2px;margin:14px 0}
+@keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="intro">
+    <h1 class="mark">Quiz nights</h1>
+    <p class="lede">Run a quiz from one screen. Everyone else follows the scores on their phone.</p>
+    <section class="join" aria-labelledby="jt">
+      <h2 id="jt">Join a quiz</h2>
+      <p>Enter the five-character room code from the host.</p>
+      <form id="jf" autocomplete="off">
+        <label class="sr" for="code" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Room code</label>
+        <input class="code" id="code" maxlength="5" placeholder="K7M2Q" inputmode="text" autocapitalize="characters" spellcheck="false" aria-describedby="err">
+        <button class="btn pri" type="submit">Join</button>
+      </form>
+      <div class="err" id="err" role="alert"></div>
+    </section>
+  </header>
+  <main class="list">
+    <h2>Host a quiz</h2>
+    <div id="quizzes"><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:85%"></div></div>
+  </main>
+</div>
+<script>
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const box = document.getElementById("quizzes");
+fetch("quizzes/index.json").then(r => { if (!r.ok) throw 0; return r.json(); }).then(d => {
+  const qs = d.quizzes || [];
+  if (!qs.length) { box.innerHTML = '<p style="color:var(--iv2)">No quizzes yet.</p>'; return; }
+  box.innerHTML = qs.map(q => `<article class="quiz"><div><h3>${esc(q.title)}</h3><p>${esc(q.description)}</p><small>${esc(q.meta || "")}</small></div>${q.status === "ready" ? `<a class="btn pri" href="play.html?quiz=${encodeURIComponent(q.id)}" aria-label="Host ${esc(q.title)}">Host this quiz</a>` : '<span class="soon">In preparation</span>'}</article>`).join("");
+}).catch(() => { box.innerHTML = '<p style="color:var(--iv2)">The quiz list could not be loaded. Reload the page to try again.</p>'; });
+document.getElementById("jf").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = document.getElementById("code").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const err = document.getElementById("err");
+  if (v.length !== 5) { err.textContent = "Room codes have five characters."; return; }
+  location.href = "play.html?room=" + v;
+});
+</script>
+</body>
+</html>

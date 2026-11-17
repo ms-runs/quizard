@@ -1,0 +1,11 @@
+{
+  "quizzes": [
+    {
+      "id": "cincinnati",
+      "title": "Cincinnati pub quiz",
+      "description": "Cincinnati history, culture and quirks over ten rounds, with a picture round and a London Underground bonus.",
+      "meta": "50 questions plus a bonus round",
+      "status": "ready"
+    }
+  ]
+}

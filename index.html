@@ -81,7 +81,7 @@ document.getElementById("jf").addEventListener("submit", e => {
   const v = document.getElementById("code").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
   const err = document.getElementById("err");
   if (v.length !== 5) { err.textContent = "Room codes have five characters."; return; }
-  location.href = "play.html?room=" + v;
+  location.href = "play.html?room=" + v + "&play=1";
 });
 </script>
 </body>

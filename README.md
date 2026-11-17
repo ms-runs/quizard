@@ -22,3 +22,10 @@ If a friend cannot connect, use **Settings > New room code**. If the host window
 ## Notes
 - The question bank is public, so anyone with the site link can read the answers in the page source.
 - Connections use PeerJS's free public signalling service. It brokers the connection only; scores travel directly between browsers.
+
+## Phones, QR and answer sheets
+
+- The host's Settings tab and the board's "Show join code" scene display a QR code and room code.
+- Friends open `play.html?room=CODE&play=1` (or enter the code on the landing page), pick or type a team name, and type answers on their phone. Answers lock when the host reveals the answer or collects the sheets.
+- In the Score tab the host sees every submitted answer, with suggested marks (dashed) that can be tapped to change, then fills the scores with one button.
+- A quiz can set `theme: "deco"` in its `quiz.js` for the Art Deco look.

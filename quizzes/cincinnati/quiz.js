@@ -3,6 +3,7 @@
    closest = closest answer wins. */
 window.QUIZ = {
   id: "cincinnati",
+  theme: "deco",
   title: "Cincinnati pub quiz",
   intro: "Ten rounds, one bonus round, and one joker each to double a round of your choice.",
   rounds: [

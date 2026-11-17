@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&family=Poiret+One&display=swap" rel="stylesheet">
 <script src="vendor/peerjs.min.js"></script>
+<script src="vendor/qrcode.js"></script>
 <style>
 :root{
   --bg:#0A0A1E; --s1:#11112B; --s2:#1A1A3A; --s3:#232348;
@@ -172,6 +173,60 @@ table.sc td{padding:8px;border-bottom:1px solid var(--line2);vertical-align:midd
 .spares li{display:block;padding:10px 0}
 .spares small{color:var(--iv3)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- join / qr ---------- */
+.qr{background:#F2EDDC;padding:14px;display:inline-block;line-height:0}
+.qr svg{width:min(30vh,280px);height:auto;display:block}
+.joinrow{display:flex;gap:clamp(24px,4vw,64px);align-items:center;flex-wrap:wrap}
+.bigcode{font-weight:500;font-size:clamp(44px,7vw,108px);letter-spacing:.14em;color:var(--gold);line-height:1}
+.hostqr .qr svg{width:180px}
+
+/* ---------- player (phone) ---------- */
+.player{min-height:100vh;display:flex;flex-direction:column;gap:14px;padding:16px;max-width:560px;margin:0 auto}
+.phead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.phead .mark{font-size:24px}
+.phead .tm{color:var(--iv2);font-size:15px}
+.qline{padding:16px 0;border-top:1px solid var(--line2)}
+.qline:first-child{border-top:0}
+.qline .qn{color:var(--gold);font-size:14px;margin:0 0 4px}
+.qline .qt{font-size:18px;line-height:1.3;margin:0 0 10px}
+.qline input,.qline textarea{width:100%;min-height:50px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:2px;font-size:17px}
+.qline textarea{min-height:150px;resize:vertical}
+.qline .st{font-size:13px;color:var(--iv3);min-height:18px;margin-top:4px}
+.qline.locked input,.qline.locked textarea{opacity:.55}
+.teampick{display:flex;flex-direction:column;gap:8px;margin:10px 0 16px}
+.psc .srow{min-height:48px}
+.srow.me .tn{color:var(--gold)}
+.arev td{vertical-align:top;min-width:96px}
+.arev .ansv{display:block;margin-bottom:6px;word-break:break-word}
+.mk{min-width:52px}
+.mk.s{border-style:dashed}
+
+/* ---------- Art Deco theme (Cincinnati) ---------- */
+body.theme-deco{background-color:var(--bg);background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'><g fill='none' stroke='%23D4AF37' stroke-opacity='.10' stroke-width='1'><path d='M0 30A30 30 0 0 1 60 30'/><path d='M10 30A20 20 0 0 1 50 30'/><path d='M20 30A10 10 0 0 1 40 30'/><path d='M-30 60A30 30 0 0 1 30 60'/><path d='M-20 60A20 20 0 0 1 20 60'/><path d='M-10 60A10 10 0 0 1 10 60'/><path d='M30 60A30 30 0 0 1 90 60'/><path d='M40 60A20 20 0 0 1 80 60'/><path d='M50 60A10 10 0 0 1 70 60'/></g></svg>")}
+.theme-deco .mark{text-transform:uppercase;letter-spacing:.16em;font-size:clamp(17px,1.9vw,24px)}
+.theme-deco .big,.theme-deco .stand h2,.theme-deco .side h3{text-transform:uppercase;letter-spacing:.06em}
+.theme-deco .big{font-size:clamp(38px,7vw,112px);line-height:1.04}
+.theme-deco .stand h2{font-size:clamp(30px,4.4vw,64px)}
+.theme-deco .crumb{letter-spacing:.02em}
+.theme-deco .stage{padding-top:clamp(44px,5.4vw,84px)}
+.theme-deco .stand{padding-top:clamp(44px,5vw,76px)}
+.theme-deco .eyebrow{display:flex;align-items:center;gap:12px}
+.theme-deco .eyebrow::before{content:"";width:8px;height:8px;border:1px solid var(--gold);transform:rotate(45deg);flex:none}
+.rays{position:absolute;inset:0;pointer-events:none;background:repeating-conic-gradient(from -90deg at 50% 120%,rgba(212,175,55,.14) 0 3deg,transparent 3deg 9deg);-webkit-mask-image:radial-gradient(ellipse 85% 95% at 50% 120%,#000 0,transparent 74%);mask-image:radial-gradient(ellipse 85% 95% at 50% 120%,#000 0,transparent 74%)}
+.stage>*{position:relative;z-index:1}
+.stage>.rays{position:absolute;z-index:0}
+.crown{position:absolute!important;left:50%;top:0;transform:translateX(-50%);width:clamp(110px,12vw,170px);z-index:2}
+.crown svg{display:block;width:100%;height:auto}
+.dd{display:flex;align-items:center;gap:12px;max-width:min(420px,60%)}
+.dd::before,.dd::after{content:"";flex:1;height:1px;background:var(--gold);opacity:.6}
+.dd i{width:9px;height:9px;border:1px solid var(--gold);transform:rotate(45deg);flex:none}
+.theme-deco .trow .rk{font-family:var(--f-d);font-size:1.45em;color:var(--iv2)}
+.theme-deco .trow.top{border-top:1px solid var(--gold);border-bottom:1px solid var(--gold);background:rgba(212,175,55,.07)}
+.theme-deco .trow.top .rk{color:var(--gold)}
+.theme-deco .srow .rk{font-family:var(--f-d);font-size:1.3em}
+.sky{display:block;width:100%;height:clamp(48px,8vw,92px);margin-top:auto;flex:none}
+.board .sky{margin-top:auto}
 </style>
 </head>
 <body>
@@ -188,6 +243,17 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Math.random().toString(36).slice(2, 8);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const CROWN = '<svg viewBox="0 0 160 58" fill="none" stroke="#D4AF37" stroke-width="1" stroke-linecap="round"><path d="M93.2 4.8L123.2 15.7M90.7 9.0L115.2 29.6M87.0 12.1L103.0 39.8M82.4 13.8L88.0 45.3M77.6 13.8L72.0 45.3M73.0 12.1L57.0 39.8M69.3 9.0L44.8 29.6M66.8 4.8L36.8 15.7M66 0A14 14 0 0 0 94 0M50 0A30 30 0 0 0 110 0M34 0A46 46 0 0 0 126 0"/><path d="M80 49L85 54L80 59L75 54Z" fill="#0A0A1E"/></svg>';
+const SKY = '<svg class="sky" viewBox="0 0 1200 92" preserveAspectRatio="xMidYMax slice" fill="rgba(10,10,30,.85)" stroke="#D4AF37" stroke-width="1" stroke-opacity=".38" aria-hidden="true"><path d="M0 92V62H30V50H46V38H62V50H78V62H110V92"/><path d="M180 92V70H210V56H236V40H258V24H276V10H286V0H294V10H304V24H322V40H344V56H370V70H400V92"/><path d="M440 92V58H470V44H500V30H540V44H570V58H600V92"/><path d="M650 92V64H700A60 60 0 0 1 820 64H870V92"/><path d="M900 92V66H930V52H950V40H1000V52H1020V66H1060V92"/><path d="M1100 92V70H1120V56H1140V44H1160V56H1180V70H1200V92"/><path d="M0 91.5H1200" fill="none"/></svg>';
+const deco = () => !!(BANK && BANK.theme === "deco");
+const decoTop = () => deco() ? `<div class="rays" aria-hidden="true"></div><div class="crown" aria-hidden="true">${CROWN}</div>` : "";
+function qrSVG(text) {
+  try {
+    const q = qrcode(0, "M"); q.addData(text); q.make(); const n = q.getModuleCount(); let d = "";
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += `M${c},${r}h1v1h-1z`;
+    return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" role="img" aria-label="QR code to join this quiz"><path d="${d}" fill="#0A0A1E"/></svg>`;
+  } catch (e) { return ""; }
+}
 const ICON = {
   left:'<path d="M10 3 5 8l5 5"/>', right:'<path d="M6 3l5 5-5 5"/>',
   eye:'<path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>',
@@ -208,7 +274,8 @@ const defaultState = () => ({
   live: { round: -1, step: 0, view: "play", timerEnd: null }
 });
 let S = defaultState();
-let role = "board";       // "host" | "board"
+let role = "board";       // "host" | "board" | "player"
+let ANS = {}, MARKS = {}, me = null, MY = {}, ST = {}, playerTab = "sheet", joinError = "", joining = false, prevView = "play";
 let tab = "run";
 let scoreRound = 0;
 let confirmReset = false;
@@ -303,6 +370,7 @@ const Net = {
       p.on("open", () => { if (g === this.gen) this.set("live"); });
       p.on("connection", conn => {
         conn.on("open", () => { this.conns.add(conn); this.sendTo(conn); this.count(); });
+        conn.on("data", m => handleHostMsg(conn, m));
         conn.on("close", () => { this.conns.delete(conn); this.count(); });
         conn.on("error", () => { this.conns.delete(conn); this.count(); });
       });
@@ -338,7 +406,7 @@ const Net = {
         if (g !== this.gen) return;
         const conn = this.conn = p.connect(peerId(c), { reliable: true });
         const to = setTimeout(() => { if (g === this.gen && this.conn === conn && this.status !== "live") retry("reconnecting", 0); }, 8000);
-        conn.on("open", () => { clearTimeout(to); if (g === this.gen) { this.lastMsg = Date.now(); this.set("live"); } });
+        conn.on("open", () => { clearTimeout(to); if (g === this.gen) { this.lastMsg = Date.now(); this.set("live"); if (role === "player" && me) conn.send({ t: "hello", teamId: me.teamId }); } });
         conn.on("data", m => { if (g === this.gen) this.onMsg(m); });
         conn.on("close", () => retry("reconnecting", 2000));
       });
@@ -347,19 +415,34 @@ const Net = {
     connect();
     this.intervals.push(setInterval(() => { if (this.status === "live" && Date.now() - this.lastMsg > 30000) { this.set("reconnecting"); connect(); } }, 5000));
   },
+  send(msg) { try { if (this.conn && this.conn.open) { this.conn.send(msg); return true; } } catch (e) {} return false; },
   onMsg(m) {
     this.lastMsg = Date.now();
     if (m.now) clockSkew = m.now - Date.now();
     if (m.t === "state") onState(m.s);
+    else if (m.t === "welcome" && role === "player") {
+      me = { teamId: m.teamId }; joining = false; joinError = "";
+      try { localStorage.setItem("pq:me:" + code, JSON.stringify(me)); } catch (e) {}
+      const theirs = m.answers || {};
+      Object.keys(MY).forEach(ri => Object.keys(MY[ri]).forEach(qi => { if (MY[ri][qi] && (!theirs[ri] || theirs[ri][qi] !== MY[ri][qi])) Net.send({ t: "ans", round: +ri, qi: +qi, text: MY[ri][qi] }); }));
+      Object.keys(theirs).forEach(ri => Object.keys(theirs[ri]).forEach(qi => { MY[ri] = MY[ri] || {}; if (!MY[ri][qi]) MY[ri][qi] = theirs[ri][qi]; }));
+      render();
+    } else if (m.t === "nope") { joining = false; joinError = "Could not join. Check the team name and try again."; render(); }
+    else if (m.t === "ack") { ST[m.round + "-" + m.qi] = m.ok ? "saved" : "closed"; setStatus(m.round, m.qi); }
   }
 };
 async function onState(s) {
   const n = normalise(s);
   try { await ensureQuiz(n.quizId); } catch (e) { return; }
-  S = n; render();
+  const pv = S.live.view; S = n;
+  if (role === "player") {
+    if (n.live.view === "scores" && pv !== "scores") playerTab = "scores"; else if (n.live.view !== "scores" && pv === "scores") playerTab = "sheet";
+    if (me && !S.teams.find(t => t.id === me.teamId)) me = null;
+  }
+  render();
 }
 function saveHost() {
-  try { localStorage.setItem("pq:" + quizId, JSON.stringify({ code, state: S })); } catch (e) {}
+  try { localStorage.setItem("pq:" + quizId, JSON.stringify({ code, state: S, ans: ANS, marks: MARKS })); } catch (e) {}
 }
 function commit(fn, quiet) {
   if (role !== "host") return;
@@ -374,6 +457,90 @@ async function ensureQuiz(id) {
   BANK = window.QUIZ; if (!BANK) throw new Error("no quiz");
   SCORED = BANK.rounds.length - 1; BONUS_IDX = BANK.rounds.findIndex(r => r.type === "bonus");
   document.title = BANK.title;
+}
+
+/* ---------- answers: locking, host handling, marking ---------- */
+function answerOpen(ri, qi) {
+  const L = S.live; if (!BANK || L.round !== ri || ri < 0) return false;
+  const steps = buildSteps(ri); const cur = Math.min(L.step, steps.length - 1);
+  const first = steps.findIndex(s => s.t === "q" && s.qi === qi); if (first < 0 || first > cur) return false;
+  let close = steps.length;
+  for (let i = first; i < steps.length; i++) { const s = steps[i]; if (s.t === "collect" || (s.t === "q" && s.qi === qi && s.reveal)) { close = i; break; } }
+  return cur < close;
+}
+function handleHostMsg(conn, m) {
+  if (!m || typeof m !== "object") return;
+  if (m.t === "hello") {
+    let id = null;
+    if (m.teamId && S.teams.find(t => t.id === m.teamId)) id = m.teamId;
+    else if (m.name) {
+      const nm = String(m.name).trim().slice(0, 32);
+      if (nm) {
+        let t = S.teams.find(x => x.name.toLowerCase() === nm.toLowerCase());
+        if (!t) { commit(s => { s.teams.push({ id: uid(), name: nm, joker: null }); }); t = S.teams[S.teams.length - 1]; }
+        id = t.id;
+      }
+    }
+    if (id) { conn._tid = id; try { conn.send({ t: "welcome", teamId: id, answers: ANS[id] || {} }); } catch (e) {} }
+    else { try { conn.send({ t: "nope" }); } catch (e) {} }
+  } else if (m.t === "ans" && conn._tid) {
+    const ri = +m.round, qi = +m.qi; const r = BANK.rounds[ri];
+    if (!r || !(qi >= 0 && qi < r.questions.length)) return;
+    const ok = answerOpen(ri, qi);
+    if (ok) { ANS[conn._tid] = ANS[conn._tid] || {}; ANS[conn._tid][ri] = ANS[conn._tid][ri] || {}; ANS[conn._tid][ri][qi] = String(m.text || "").slice(0, 600); saveHost(); if (role === "host" && (tab === "run" || tab === "score")) renderSoft(); }
+    try { conn.send({ t: "ack", round: ri, qi, ok }); } catch (e) {}
+  }
+}
+let softTimer = null;
+function renderSoft() { if (softTimer) return; softTimer = setTimeout(() => { softTimer = null; if (!document.activeElement || !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) render(); }, 400); }
+const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9 ]/g, " ").replace(/\b(the|a|an)\b/g, " ").replace(/\s+/g, " ").trim();
+function lev(a, b) { const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let prev = Array.from({ length: n + 1 }, (_, i) => i); for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; } return prev[n]; }
+function suggest(r, q, text) {
+  if (!text || q.closest || r.type === "picture" || r.type === "bonus" || r.type === "tiebreak") return 0;
+  const t = norm(text); if (!t) return 0;
+  const cands = [q.a.replace(/\s*\(.*\)\s*/g, ""), ...(q.acc || [])].map(norm).filter(Boolean);
+  for (const c of cands) { if (t === c) return 1; if (/[a-z]/.test(c) && c.length >= 5 && lev(t, c) <= (c.length >= 9 ? 2 : 1)) return 1; }
+  return 0;
+}
+function effMark(tid, ri, qi) {
+  const m = MARKS[tid] && MARKS[tid][ri] && MARKS[tid][ri][qi]; if (m !== undefined) return m;
+  const r = BANK.rounds[ri]; const txt = ANS[tid] && ANS[tid][ri] && ANS[tid][ri][qi]; return suggest(r, r.questions[qi], txt);
+}
+function roundHasAnswers(ri) { return S.teams.some(t => ANS[t.id] && ANS[t.id][ri] && Object.values(ANS[t.id][ri]).some(v => v && v.trim())); }
+function answersLine() {
+  const L = S.live; if (L.round < 0 || !S.teams.length) return "";
+  const c = curStep(); const s = c.s; const mode = BANK.rounds[L.round].forceMode || S.answerMode;
+  const perQ = mode === "each" && s.t === "q";
+  const n = S.teams.filter(t => { const a = ANS[t.id] && ANS[t.id][L.round]; if (!a) return false; return perQ ? !!(a[s.qi] && a[s.qi].trim()) : Object.values(a).some(v => v && v.trim()); }).length;
+  if (!n && !Net.watchers) return "";
+  return `<p class="note" style="margin-top:8px">Phone answers: ${n} of ${S.teams.length} teams ${perQ ? "have answered this question" : "have answered this round"}.</p>`;
+}
+function reviewHTML(ri) {
+  const r = BANK.rounds[ri]; if (!roundHasAnswers(ri) || !S.teams.length) return "";
+  const per = r.type === "picture" ? 2 : 1; const bonus = r.type === "bonus";
+  const head = bonus ? "<th>Answer</th>" : r.questions.map((q, i) => `<th>Q${i + 1}</th>`).join("");
+  const rows = S.teams.map(t => {
+    const cells = r.questions.map((q, qi) => {
+      const txt = (ANS[t.id] && ANS[t.id][ri] && ANS[t.id][ri][qi]) || "";
+      if (bonus) return `<td><span class="ansv">${esc(txt) || "·"}</span></td>`;
+      const defined = MARKS[t.id] && MARKS[t.id][ri] && MARKS[t.id][ri][qi] !== undefined; const eff = effMark(t.id, ri, qi);
+      return `<td><span class="ansv">${esc(txt) || "·"}</span><button class="btn sm mk ${defined ? "" : "s"} ${eff > 0 ? "pri" : ""}" data-mk="${t.id}|${ri}|${qi}" aria-label="Mark ${esc(t.name)} question ${qi + 1}">${eff}${per > 1 ? "/" + per : ""}</button></td>`;
+    }).join("");
+    return `<tr><td>${esc(t.name)}</td>${cells}</tr>`;
+  }).join("");
+  return `<div class="panel"><h3>Phone answers</h3><p class="note">${bonus ? "Count the real stations yourself, then enter the score above." : "Dashed buttons are suggestions. Tap to change a mark, then use the marks as scores."}</p>
+    <div style="overflow-x:auto;margin-top:10px"><table class="sc arev"><thead><tr><th>Team</th>${head}</tr></thead><tbody>${rows}</tbody></table></div>
+    ${bonus ? "" : `<div class="row" style="margin-top:14px"><button class="btn pri" data-act="usemarks" data-ri="${ri}">Use these marks as scores</button></div>`}</div>`;
+}
+function useMarks(ri) {
+  const r = BANK.rounds[ri];
+  commit(s => { s.teams.forEach(t => { let sum = 0; r.questions.forEach((q, qi) => { sum += effMark(t.id, ri, qi); }); s.scores[t.id] = s.scores[t.id] || {}; s.scores[t.id][ri] = Math.max(r.min ?? 0, Math.min(r.max, sum)); }); });
+  toast = "Scores filled from marks."; render();
+}
+function cycleMark(tid, ri, qi) {
+  const r = BANK.rounds[ri]; const per = r.type === "picture" ? 2 : 1; const cur = effMark(tid, ri, qi);
+  MARKS[tid] = MARKS[tid] || {}; MARKS[tid][ri] = MARKS[tid][ri] || {}; MARKS[tid][ri][qi] = (cur + 1) % (per + 1);
+  saveHost(); render();
 }
 
 /* =====================================================================
@@ -399,24 +566,24 @@ function sideStandings() {
 function stageHTML() {
   const L = S.live; const r = BANK.rounds[L.round]; const steps = buildSteps(L.round);
   const s = steps[Math.min(L.step, steps.length - 1)];
-  const eb = (t) => `<div class="eyebrow">${esc(t)}</div>`;
+  const eb = (t, d) => `<div class="eyebrow">${esc(t)}</div>${d && deco() ? '<div class="dd" aria-hidden="true"><i></i></div>' : ""}`;
   if (s.t === "intro") {
     const num = r.type === "tiebreak" ? "Tiebreaker" : r.type === "bonus" ? "Bonus" : `Round ${L.round + 1}`;
-    return `<section class="frame stage">${eb(num)}<h1 class="big">${esc(r.title)}</h1><p class="rule">${esc(r.rule)}</p></section>`;
+    return `<section class="frame stage">${decoTop()}${eb(num, 1)}<h1 class="big">${esc(r.title)}</h1><p class="rule">${esc(r.rule)}</p></section>`;
   }
   if (s.t === "q") {
     const q = r.questions[s.qi]; const n = r.questions.length;
     const label = r.type === "bonus" ? "The challenge" : r.type === "tiebreak" ? "Closest answer wins" : `Question ${s.qi + 1} of ${n}${s.phase === "answers" ? " · answers" : ""}`;
     const photo = r.type === "picture" ? `<div class="photo">Look at the host's screen</div>` : "";
     const ans = s.reveal ? `<div class="ans"><small>Answer</small><b>${esc(q.a)}</b></div>` : "";
-    return `<section class="frame stage">${eb(label)}<p class="qtext ${r.type === "bonus" ? "wide" : ""}">${esc(q.q)}</p>${photo}${ans}</section>`;
+    return `<section class="frame stage">${decoTop()}${eb(label)}<p class="qtext ${r.type === "bonus" ? "wide" : ""}">${esc(q.q)}</p>${photo}${ans}</section>`;
   }
   if (s.t === "timer") {
-    return `<section class="frame stage">${eb("Bonus round")}<div class="clock num" id="clock" data-secs="${s.secs}">${fmt(s.secs)}</div><p class="rule">${esc(r.rule)}</p></section>`;
+    return `<section class="frame stage">${decoTop()}${eb("Bonus round", 1)}<div class="clock num" id="clock" data-secs="${s.secs}">${fmt(s.secs)}</div><p class="rule">${esc(r.rule)}</p></section>`;
   }
-  if (s.t === "collect") return `<section class="frame stage">${eb(r.type === "bonus" ? "Time" : "Pens down")}<h1 class="big">${r.type === "bonus" ? "Time is up" : "Hand in your sheets"}</h1><p class="sub">Marking comes next.</p></section>`;
-  if (s.t === "finale") return `<section class="frame stage">${eb("Put your first three answers together")}<h1 class="big num">01 / 19 / 2021</h1><p class="sub">What happened on that date?</p></section>`;
-  if (s.t === "marking") return `<section class="frame stage">${eb(`Round ${L.round + 1}`)}<h1 class="big">Marking</h1><p class="sub">Scores are next.</p></section>`;
+  if (s.t === "collect") return `<section class="frame stage">${decoTop()}${eb(r.type === "bonus" ? "Time" : "Pens down", 1)}<h1 class="big">${r.type === "bonus" ? "Time is up" : "Hand in your sheets"}</h1><p class="sub">Marking comes next.</p></section>`;
+  if (s.t === "finale") return `<section class="frame stage">${decoTop()}${eb("Put your first three answers together", 1)}<h1 class="big num">01 / 19 / 2021</h1><p class="sub">What happened on that date?</p></section>`;
+  if (s.t === "marking") return `<section class="frame stage">${decoTop()}${eb(`Round ${L.round + 1}`, 1)}<h1 class="big">Marking</h1><p class="sub">Scores are next.</p></section>`;
   return "";
 }
 const fmt = secs => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
@@ -444,7 +611,7 @@ function standingsScene() {
     return `<div class="trow num ${r.rank === 1 ? "top" : ""}" data-id="${r.id}" data-new="${i}" data-prev="${pi}"><div class="rk">${r.rank}${r.tie ? "=" : ""}${mvh}</div><div class="tn">${esc(r.name)}</div>${cells}<div class="tot">${r.total}</div></div>`;
   }).join("");
   const lbl = through === BONUS_IDX ? "Final standings" : `After round ${through + 1}`;
-  return `<section class="frame stand"><h2>${esc(lbl)}</h2><p class="sub2">${esc(BANK.rounds[through].title)}</p>
+  return `<section class="frame stand">${deco() ? `<div class="crown" aria-hidden="true">${CROWN}</div>` : ""}<h2>${esc(lbl)}</h2><p class="sub2">${esc(BANK.rounds[through].title)}</p>
     <div style="--n:${n}"><div class="trow thead"><div>Rank</div><div>Team</div>${heads}<div style="text-align:right;padding-right:6px">Total</div></div><div id="rows" style="--n:${n}">${body}</div></div></section>`;
 }
 function animateRows() {
@@ -458,16 +625,17 @@ function animateRows() {
 }
 function renderBoard() {
   const L = S.live;
-  let scene = L.view === "scores" ? "scores" : L.round < 0 ? "lobby" : "play";
+  let scene = L.view === "scores" ? "scores" : L.view === "join" ? "join" : L.round < 0 ? "lobby" : "play";
   let body = "";
   if (scene === "scores") body = `<div class="bbody">${standingsScene()}</div>`;
+  else if (scene === "join") body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="eyebrow">Join the quiz</div><h1 class="big">Scan to join</h1>${joinPanel()}</section></div>`;
   else if (scene === "lobby") {
-    body = `<div class="bbody"><section class="frame stage"><div class="eyebrow">Tonight</div><h1 class="big">${esc(BANK.title)}</h1><p class="sub">${S.teams.length ? S.teams.map(t => esc(t.name)).join(" · ") : "Teams are being added."}</p><p class="rule">${esc(BANK.intro || "")}</p><p class="rule">Follow along on your phone: ${esc(joinBase())} with room code <b class="num" style="color:var(--gold);font-weight:500">${esc(code)}</b></p></section></div>`;
+    body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="eyebrow">Tonight</div><h1 class="big">${esc(BANK.title)}</h1><p class="sub">${S.teams.length ? S.teams.map(t => esc(t.name)).join(" · ") : "Teams are being added."}</p><p class="rule">${esc(BANK.intro || "")}</p>${joinPanel()}</section></div>`;
   } else {
     const side = sideStandings();
     body = `<div class="bbody ${side ? "split" : ""}">${stageHTML()}${side}</div>`;
   }
-  $("#app").innerHTML = `<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : crumb())}</div></header>${body}<div class="sr" role="status">${esc(netText())}</div></div>`;
+  $("#app").innerHTML = `<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`;
   tickClock();
   if (scene === "scores" && (boardLast.scene !== "scores" || boardLast.shown !== S.shown)) animateRows();
   boardLast = { scene, shown: S.shown };
@@ -477,7 +645,11 @@ function renderBoard() {
    host
    ===================================================================== */
 function joinBase() { return location.href.split("?")[0].replace(/[^/]*$/, "") + "play.html"; }
-function joinURL() { return joinBase() + "?room=" + code; }
+function joinURL() { return joinBase() + "?room=" + code + "&play=1"; }
+function boardURL() { return joinBase() + "?room=" + code; }
+function joinPanel() {
+  return `<div class="joinrow"><div class="qr">${qrSVG(joinURL())}</div><div><div class="eyebrow" style="margin-bottom:10px">Room code</div><div class="bigcode num">${esc(code)}</div><p class="rule" style="margin-top:12px">Scan the code, or go to ${esc(joinBase().replace(/^https?:\/\//, ""))} and enter the room code.</p></div></div>`;
+}
 function netText() {
   const st = Net.status;
   if (role === "host") return { live: "Online", connecting: "Connecting", reconnecting: "Reconnecting", reclaiming: "Reclaiming this room", taken: "Room code is in use", offline: "Offline: friends cannot connect" }[st] || "";
@@ -509,6 +681,7 @@ function actions() {
       const idx = c.steps.findIndex((x, k) => k > c.i && x.t === "q" && x.qi === c.s.qi && x.reveal);
       if (idx >= 0) commit(s => { s.live.step = idx; });
     },
+    toggleJoin() { commit(s => { s.live.view = s.live.view === "join" ? "play" : "join"; }); },
     toggleScores() { commit(s => { s.live.view = s.live.view === "scores" ? "play" : "scores"; }); },
     timer(on) { commit(s => { s.live.timerEnd = on ? Date.now() + (curStep().s.secs || 150) * 1000 : null; }); }
   };
@@ -531,6 +704,7 @@ function runTab() {
       <div class="panel">
         <div class="now"><small>${esc(r.title)} · step ${c.i + 1} of ${c.steps.length} · ${esc(stepLabel(r, s))}</small>${esc(nowText)}</div>
         ${q ? `<div class="ansbox"><small>Answer</small><b style="font-weight:500">${esc(q.a)}</b>${q.closest ? '<small style="margin-top:4px">Closest wins</small>' : ""}</div>` : ""}
+        ${answersLine()}
         ${q && q.note ? `<p class="note">${esc(q.note)}</p>` : ""}
         ${q && q.flag ? `<div class="flag">${ic("flag")}${esc(q.flag)}</div>` : ""}
         ${s.t === "intro" ? `<p class="note">${esc(r.note)}</p>` : ""}
@@ -545,7 +719,7 @@ function runTab() {
         <div class="kbd"><b>←</b> <b>→</b> step · <b>Space</b> reveal · <b>S</b> scores on the board</div>
       </div>
       <div class="panel"><h3>On the board</h3>
-        <button class="btn ${L.view === "scores" ? "pri" : ""}" data-act="toggleScores">${ic("list")}${L.view === "scores" ? "Back to the quiz" : "Show standings"}</button>
+        <div class="ctrls"><button class="btn ${L.view === "scores" ? "pri" : ""}" data-act="toggleScores">${ic("list")}${L.view === "scores" ? "Back to the quiz" : "Show standings"}</button><button class="btn ${L.view === "join" ? "pri" : ""}" data-act="toggleJoin">${ic("board")}${L.view === "join" ? "Back to the quiz" : "Show join code"}</button></div>
         <p class="note" style="margin-top:12px">Published through ${S.shown < 0 ? "no rounds yet" : "round " + (S.shown + 1)}.</p>
         <h3 style="margin-top:18px">Jump to a step</h3>
         <ul class="steplist">${c.steps.map((x, k) => `<li><button class="${k === c.i ? "cur" : k < c.i ? "done" : ""}" data-go="${k}" aria-label="${esc(stepLabel(r, x))}">${stepShort(r, x, k)}</button></li>`).join("")}</ul>
@@ -554,6 +728,10 @@ function runTab() {
   return top;
 }
 function scoreTab() {
+  const ri0 = Math.min(scoreRound, BANK.rounds.length - 2);
+  return `<div style="display:flex;flex-direction:column;gap:20px">${scoreTabMain()}${reviewHTML(ri0)}</div>`;
+}
+function scoreTabMain() {
   const ri = Math.min(scoreRound, BANK.rounds.length - 2); const r = BANK.rounds[ri];
   const min = r.min ?? 0, max = r.max;
   const chips = BANK.rounds.slice(0, SCORED).map((x, i) => `<button class="btn sm ${i === ri ? "pri" : ""}" data-sr="${i}" aria-label="${esc(x.title)}">${x.type === "bonus" ? "Bonus" : "R" + (i + 1)}${S.shown >= i ? " ✓" : ""}</button>`).join("");
@@ -589,10 +767,12 @@ function settingsTab() {
       <label class="row" style="min-height:44px"><input type="radio" name="am" value="each" ${S.answerMode === "each" ? "checked" : ""}> Reveal after each question</label>
       <label class="row" style="min-height:44px"><input type="radio" name="am" value="end" ${S.answerMode === "end" ? "checked" : ""}> Collect sheets, then reveal at the end of the round</label>
       <p class="note">The picture round and bonus round always use sheets at the end.</p></div>
-    <div class="panel"><h3>Share the board</h3>
-      <label class="lbl" for="bl">Link for friends (room ${esc(code)})</label>
+    <div class="panel"><h3>Invite friends</h3>
+      <label class="lbl" for="bl">Link for phones (room ${esc(code)})</label>
       <div class="row"><input class="inp sp" id="bl" readonly value="${esc(base)}"><button class="btn" data-copy="link">${ic("copy")}Copy</button></div>
       <p class="note" style="margin-top:8px">Friends open the link on their phone, or go to the site and enter room code <b class="num" style="color:var(--gold);font-weight:500">${esc(code)}</b>. Keep this window open during the quiz.</p>
+      <label class="lbl" for="bl2" style="margin-top:12px">Board link for the TV</label><div class="row"><input class="inp sp" id="bl2" readonly value="${esc(boardURL())}"><button class="btn" data-copy="board">${ic("copy")}Copy</button></div>
+      <div class="hostqr" style="margin-top:14px"><div class="qr">${qrSVG(base)}</div></div>
       <div class="row" style="margin-top:12px"><button class="btn" data-copy="results">${ic("copy")}Copy results text</button><span class="toast">${esc(toast)}</span></div></div>
     <div class="panel"><h3>Room</h3><p class="note">Use a new room code if friends cannot connect or the code is in use.</p><button class="btn" data-act="newroom" style="margin-top:10px">New room code</button></div>
     <div class="panel"><h3>Reset</h3>${confirmReset ? `<p class="note">This clears teams, scores and progress.</p><div class="row" style="margin-top:10px"><button class="btn danger" data-reset="yes">Clear everything</button><button class="btn" data-reset="no">Cancel</button></div>` : `<button class="btn danger" data-reset="ask">Start a new quiz</button>`}</div>
@@ -626,7 +806,7 @@ document.addEventListener("click", e => {
   if (role !== "host") return;
   const t = e.target.closest("button"); if (!t) return;
   const d = t.dataset;
-  if (d.act) { if (d.act === "next") A.next(); else if (d.act === "back") A.back(); else if (d.act === "reveal") A.reveal(); else if (d.act === "toggleScores") A.toggleScores(); else if (d.act === "timer1") A.timer(true); else if (d.act === "timer0") A.timer(false); else if (d.act === "newroom") { code = newCode(); saveHost(); Net.host(code); render(); } return; }
+  if (d.act) { if (d.act === "next") A.next(); else if (d.act === "back") A.back(); else if (d.act === "reveal") A.reveal(); else if (d.act === "toggleScores") A.toggleScores(); else if (d.act === "toggleJoin") A.toggleJoin(); else if (d.act === "usemarks") useMarks(+d.ri); else if (d.act === "timer1") A.timer(true); else if (d.act === "timer0") A.timer(false); else if (d.act === "newroom") { code = newCode(); saveHost(); Net.host(code); render(); } return; }
   if (d.tab) { tab = d.tab; if (d.sr !== undefined) scoreRound = +d.sr; return render(); }
   if (d.start !== undefined) { A.start(+d.start); return; }
   if (d.go !== undefined) return A.go(+d.go);
@@ -638,8 +818,10 @@ document.addEventListener("click", e => {
   if (d.addteam !== undefined) return addTeam();
   if (d.del) { commit(s => { s.teams = s.teams.filter(x => x.id !== d.del); delete s.scores[d.del]; }); return; }
   if (d.copy === "link") return copy(joinURL(), "Link copied.");
+  if (d.copy === "board") return copy(boardURL(), "Board link copied.");
+  if (d.mk) { const [tid, ri, qi] = d.mk.split("|"); return cycleMark(tid, +ri, +qi); }
   if (d.copy === "results") return copy(resultsText(), "Results copied.");
-  if (d.reset) { if (d.reset === "ask") confirmReset = true; else if (d.reset === "no") confirmReset = false; else { confirmReset = false; commit(s => { Object.assign(s, defaultState(), { rev: s.rev }); }); } return render(); }
+  if (d.reset) { if (d.reset === "ask") confirmReset = true; else if (d.reset === "no") confirmReset = false; else { confirmReset = false; ANS = {}; MARKS = {}; commit(s => { Object.assign(s, defaultState(), { rev: s.rev, quizId: s.quizId }); }); } return render(); }
 });
 document.addEventListener("change", e => {
   if (role !== "host") return; const el = e.target;
@@ -684,28 +866,99 @@ async function copy(text, msg) {
 }
 
 /* =====================================================================
+   player (phone)
+   ===================================================================== */
+function setStatus(ri, qi) {
+  const el = document.querySelector(`[data-st="${ri}-${qi}"]`); if (!el) return;
+  const v = ST[ri + "-" + qi]; el.textContent = v === "saved" ? "Saved" : v === "closed" ? "Too late, this question is closed" : v === "sending" ? "Saving" : "";
+}
+function visibleQs(ri) {
+  const L = S.live; if (ri < 0 || !BANK) return [];
+  const steps = buildSteps(ri); const cur = Math.min(L.step, steps.length - 1); const out = [];
+  BANK.rounds[ri].questions.forEach((q, qi) => { const first = steps.findIndex(s => s.t === "q" && s.qi === qi); if (first >= 0 && first <= cur) out.push(qi); });
+  return out;
+}
+function playerHTML() {
+  const head = `<div class="phead"><div class="mark">${esc(BANK.title)}</div><div class="tm">Room ${esc(code)}</div></div>`;
+  if (!me) {
+    const list = S.teams.map(t => `<button class="btn" data-pj="${t.id}">${esc(t.name)}</button>`).join("");
+    return `<div class="player">${head}<section class="frame" style="padding:20px"><h2 style="margin:0 0 6px;font-weight:500;font-size:24px">Which team are you?</h2><p class="note">Pick your team, or type a new name. One phone per team.</p>
+      ${list ? `<div class="teampick">${list}</div>` : ""}
+      <label class="lbl" for="pname">Team name</label><input class="inp" id="pname" data-fk="pname" maxlength="32" autocomplete="off" placeholder="The Porkopolitans">
+      <div class="row" style="margin-top:12px"><button class="btn pri" data-pjn>${joining ? "Joining" : "Join"}</button></div>
+      ${joinError ? `<p class="note" role="alert" style="color:#e58f8f;margin-top:10px">${esc(joinError)}</p>` : ""}</section></div>`;
+  }
+  const team = S.teams.find(t => t.id === me.teamId);
+  const tabs = `<div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="${playerTab === "sheet"}" data-ptab="sheet">Answers</button><button class="tab" role="tab" aria-selected="${playerTab === "scores"}" data-ptab="scores">Scores</button></div>`;
+  let body = "";
+  const L = S.live;
+  if (playerTab === "scores") {
+    if (S.shown < 0) body = `<p class="note">No scores yet.</p>`;
+    else { const rows = standings(S.shown); body = `<section class="frame psc" style="padding:16px"><div class="sub" style="font-size:14px;color:var(--iv3);margin-bottom:6px">After ${S.shown === BONUS_IDX ? "the bonus round" : "round " + (S.shown + 1)}</div>${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""} ${r.id === me.teamId ? "me" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${esc(r.name)}</span><span class="tt">${r.total}</span></div>`).join("")}</section>`; }
+  } else if (L.round < 0) body = `<p class="note">The quiz has not started. Your answer sheet will appear here.</p>`;
+  else {
+    const ri = L.round; const r = BANK.rounds[ri]; const qs = visibleQs(ri);
+    body = `<section class="frame" style="padding:8px 18px"><div class="eyebrow" style="padding-top:12px">${esc(r.type === "bonus" ? "Bonus round" : "Round " + (ri + 1))}</div><div style="font-size:20px;margin:2px 0 8px">${esc(r.title)}</div>` +
+      (qs.length ? qs.map(qi => {
+        const q = r.questions[qi]; const open = answerOpen(ri, qi); const v = (MY[ri] && MY[ri][qi]) || "";
+        const label = r.type === "picture" ? "Picture " + (qi + 1) : r.type === "bonus" ? "Stations, in order" : "Question " + (qi + 1);
+        const txt = r.type === "picture" ? "" : `<p class="qt">${esc(q.q)}</p>`;
+        const field = r.type === "bonus" ? `<textarea data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" placeholder="One station per line">${esc(v)}</textarea>` : `<input data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" autocomplete="off" autocapitalize="sentences" value="${esc(v)}">`;
+        return `<div class="qline ${open ? "" : "locked"}"><p class="qn">${label}${open ? "" : " · closed"}</p>${txt}${field}<div class="st" data-st="${ri}-${qi}" role="status"></div></div>`;
+      }).join("") : `<p class="note" style="padding:8px 0 14px">Waiting for the first question.</p>`) + `</section>`;
+  }
+  return `<div class="player">${head}<div class="phead"><div style="font-size:18px">${esc(team ? team.name : "")}</div><button class="btn sm" data-pleave>Change team</button></div>${tabs}${body}</div>`;
+}
+function renderPlayer() {
+  const ae = document.activeElement; const fk = ae && ae.dataset && ae.dataset.fk; const pos = ae && ae.selectionStart; const val = ae && ae.tagName.match(/INPUT|TEXTAREA/) ? ae.value : null;
+  $("#app").innerHTML = playerHTML();
+  if (fk) { const el = $(`[data-fk="${fk}"]`); if (el && !el.disabled) { if (val !== null && el.dataset.pa) el.value = val; el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
+  $$("[data-st]").forEach(el => { const [a, b] = el.dataset.st.split("-"); setStatus(a, b); });
+}
+let sendTimers = {};
+function sendAnswer(ri, qi, text) {
+  MY[ri] = MY[ri] || {}; MY[ri][qi] = text; ST[ri + "-" + qi] = "sending"; setStatus(ri, qi);
+  const k = ri + "-" + qi; clearTimeout(sendTimers[k]);
+  sendTimers[k] = setTimeout(() => { if (!Net.send({ t: "ans", round: ri, qi, text })) { ST[k] = ""; const el = document.querySelector(`[data-st="${k}"]`); if (el) el.textContent = "Offline. Will retry when reconnected."; } }, 450);
+  try { localStorage.setItem("pq:my:" + code, JSON.stringify(MY)); } catch (e) {}
+}
+document.addEventListener("input", e => { if (role !== "player") return; const el = e.target; if (el.dataset.pa) { const [ri, qi] = el.dataset.pa.split("|"); sendAnswer(+ri, +qi, el.value); } });
+document.addEventListener("click", e => {
+  if (role !== "player") return; const t = e.target.closest("button"); if (!t) return; const d = t.dataset;
+  if (d.ptab) { playerTab = d.ptab; return render(); }
+  if (d.pj) { const tm = S.teams.find(x => x.id === d.pj); joining = true; joinError = ""; Net.send({ t: "hello", teamId: d.pj, name: tm && tm.name }); return render(); }
+  if (d.pjn !== undefined) { const v = ($("#pname") || {}).value || ""; if (!v.trim()) { joinError = "Enter a team name."; return render(); } joining = true; joinError = ""; if (!Net.send({ t: "hello", name: v })) { joining = false; joinError = "Not connected yet. Try again in a moment."; } return render(); }
+  if (d.pleave !== undefined) { me = null; MY = {}; try { localStorage.removeItem("pq:me:" + code); localStorage.removeItem("pq:my:" + code); } catch (e) {} return render(); }
+});
+
+/* =====================================================================
    boot
    ===================================================================== */
 function message(title, body, action) {
   $("#app").innerHTML = `<div class="center"><div class="panel"><h3>${esc(title)}</h3><p class="note">${esc(body)}</p>${action || ""}</div></div>`;
 }
 function render() {
-  if (role === "board" && !BANK) {
+  if ((role === "board" || role === "player") && !BANK) {
     const waiting = { waiting: "Waiting for the host to open the room.", offline: "Cannot reach the connection service. Retrying.", reconnecting: "Reconnecting." }[Net.status] || "Connecting to the room.";
     return message(`Room ${code}`, waiting, '<div class="skeleton" style="width:70%;margin-top:14px"></div>');
   }
-  if (role === "host") renderHost(); else renderBoard();
+  document.body.classList.toggle("theme-deco", deco());
+  if (role === "host") renderHost(); else if (role === "player") renderPlayer(); else renderBoard();
 }
 (async function boot() {
   const q = new URLSearchParams(location.search);
   const room = (q.get("room") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   const qz = q.get("quiz");
-  if (room) { role = "board"; code = room; render(); Net.board(room); return; }
+  if (room) {
+    code = room; role = q.get("play") ? "player" : "board";
+    if (role === "player") { try { me = JSON.parse(localStorage.getItem("pq:me:" + room)); MY = JSON.parse(localStorage.getItem("pq:my:" + room)) || {}; } catch (e) { me = null; MY = {}; } }
+    render(); Net.board(room); return;
+  }
   if (qz) {
     try { await ensureQuiz(qz); } catch (e) { return message("Quiz not found", "Check the link, or pick a quiz from the list.", '<a class="btn" href="index.html" style="margin-top:12px">All quizzes</a>'); }
     role = "host"; quizId = qz; ready = true;
     let saved = null; try { saved = JSON.parse(localStorage.getItem("pq:" + qz)); } catch (e) {}
-    if (saved && saved.code && saved.state) { code = saved.code; S = normalise(saved.state); } else { code = newCode(); S = defaultState(); }
+    if (saved && saved.code && saved.state) { code = saved.code; S = normalise(saved.state); ANS = saved.ans || {}; MARKS = saved.marks || {}; } else { code = newCode(); S = defaultState(); }
     S.quizId = qz; tab = S.live.round < 0 ? "teams" : "run";
     saveHost(); Net.host(code); render(); return;
   }

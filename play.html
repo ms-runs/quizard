@@ -346,8 +346,12 @@ const stepShort = (r, s, i) => s.t === "q" ? `${s.qi + 1}${s.reveal ? "a" : ""}`
    ===================================================================== */
 const PEER_OPTS = (() => {
   const q = new URLSearchParams(location.search).get("broker"); // dev only: ?broker=localhost:9000
-  if (!q) return { debug: 0 };
-  const [host, port] = q.split(":"); return { host, port: +port, path: "/", secure: false, debug: 0 };
+  const config = { iceServers: [
+    { urls: "stun:stun.l.google.com:19302" }, { urls: "stun:global.stun.twilio.com:3478" },
+    { urls: ["turn:openrelay.metered.ca:80", "turn:openrelay.metered.ca:443", "turns:openrelay.metered.ca:443?transport=tcp"], username: "openrelayproject", credential: "openrelayproject" }
+  ] };
+  if (!q) return { debug: 0, config };
+  const [host, port] = q.split(":"); return { host, port: +port, path: "/", secure: false, debug: 0, config };
 })();
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const newCode = () => Array.from({ length: 5 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join("");
@@ -939,7 +943,7 @@ function message(title, body, action) {
 }
 function render() {
   if ((role === "board" || role === "player") && !BANK) {
-    const waiting = { waiting: "Waiting for the host to open the room.", offline: "Cannot reach the connection service. Retrying.", reconnecting: "Reconnecting." }[Net.status] || "Connecting to the room.";
+    const waiting = { waiting: "Waiting for the host to open the room. Check the room code, and that the host tab is open and says Online.", offline: "Cannot reach the connection service. Check your internet connection. Retrying.", reconnecting: "Could not reach the host yet. Still trying. If this lasts, switch between wifi and mobile data." }[Net.status] || "Connecting to the room.";
     return message(`Room ${code}`, waiting, '<div class="skeleton" style="width:70%;margin-top:14px"></div>');
   }
   document.body.classList.toggle("theme-deco", deco());

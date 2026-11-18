@@ -1081,7 +1081,7 @@ function playerHTML() {
 function renderPlayer() {
   const ae = document.activeElement; const fk = ae && ae.dataset && ae.dataset.fk; const pos = ae && ae.selectionStart; const val = ae && ae.tagName.match(/INPUT|TEXTAREA/) ? ae.value : null;
   $("#app").innerHTML = playerHTML();
-  if (fk) { const el = $(`[data-fk="${fk}"]`); if (el && !el.disabled) { if (val !== null && el.dataset.pa) el.value = val; el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
+  if (fk) { const el = $(`[data-fk="${fk}"]`); if (el && !el.disabled) { if (val !== null) el.value = val; el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
   $$("[data-st]").forEach(el => { const [a, b] = el.dataset.st.split("-"); setStatus(a, b); });
 }
 function sendAnswerNow(ri, qi, text) {
@@ -1096,6 +1096,7 @@ function sendAnswer(ri, qi, text) {
   sendTimers[k] = setTimeout(() => { if (!Net.send({ t: "ans", round: ri, qi, text })) { ST[k] = ""; const el = document.querySelector(`[data-st="${k}"]`); if (el) el.textContent = "Offline. Will retry when reconnected."; } }, 450);
   try { localStorage.setItem("pq:my:" + code, JSON.stringify(MY)); } catch (e) {}
 }
+document.addEventListener("keydown", e => { if (role === "player" && e.key === "Enter" && e.target.id === "pname") { const b = $("[data-pjn]"); if (b) b.click(); } });
 document.addEventListener("input", e => { if (role !== "player") return; const el = e.target; if (el.dataset.pa) { const [ri, qi] = el.dataset.pa.split("|"); sendAnswer(+ri, +qi, el.value); } });
 document.addEventListener("click", e => {
   if (role !== "player") return; const t = e.target.closest("button"); if (!t) return; const d = t.dataset;

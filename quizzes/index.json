@@ -6,6 +6,13 @@
       "description": "Cincinnati history, culture and quirks over ten rounds, with a picture round and a London Underground bonus.",
       "meta": "50 questions plus a bonus round",
       "status": "ready"
+    },
+    {
+      "id": "fun10",
+      "title": "The Big Fun Pub Quiz",
+      "description": "Ten multiple-choice rounds: geography, music, fonts, history, Pantone colours, films, sport, flags, news and a picture round.",
+      "meta": "50 multiple-choice questions",
+      "status": "ready"
     }
   ]
 }

@@ -227,6 +227,30 @@ body.theme-deco{background-color:var(--bg);background-image:url("data:image/svg+
 .theme-deco .srow .rk{font-family:var(--f-d);font-size:1.3em}
 .sky{display:block;width:100%;height:clamp(48px,8vw,92px);margin-top:auto;flex:none}
 .board .sky{margin-top:auto}
+
+/* ---------- multiple choice + visuals ---------- */
+.mcqrow{display:flex;gap:clamp(20px,3vw,56px);align-items:center;flex-wrap:wrap}
+.mcqtxt{flex:1 1 320px;display:flex;flex-direction:column;gap:clamp(14px,2vw,28px);min-width:0}
+.mcq .qtext{font-size:clamp(24px,3.2vw,52px)}
+.opts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,1vw,16px)}
+.opts li{display:flex;gap:12px;align-items:center;border:1px solid var(--line);padding:clamp(10px,1.2vw,18px) clamp(12px,1.4vw,20px);font-size:clamp(17px,2vw,30px);line-height:1.2;transition:opacity .4s,background .4s}
+.opts li b{font-weight:500;color:var(--gold);min-width:1.2em}
+.opts.rev li.wrong{opacity:.3}
+.opts.rev li.right{background:rgba(212,175,55,.16);border-color:var(--gold)}
+.vis{flex:0 0 auto;width:clamp(240px,36vw,600px);aspect-ratio:4/3;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden;background:var(--bg)}
+.vis.sm{width:100%;max-width:240px;margin:0 0 10px}
+.swatch{border-color:var(--iv3)}
+.fontbox{padding:12px;text-align:center;font-size:clamp(28px,4vw,64px);line-height:1.1;color:var(--ivory);word-break:break-word}
+.vis.sm.fontbox{font-size:34px}
+.flagbox img{width:100%;height:100%;object-fit:contain;display:block}
+.svgbox svg{width:100%;height:100%;display:block}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{display:flex;gap:12px;align-items:center;text-align:left;min-height:52px;padding:10px 14px;background:var(--bg);border:1px solid var(--line);color:var(--ivory);font-size:17px;cursor:pointer;border-radius:2px;width:100%}
+.choice b{color:var(--gold);font-weight:500;min-width:1.2em}
+.choice[aria-pressed=true]{background:var(--gold);color:#0A0A1E;border-color:var(--gold)}
+.choice[aria-pressed=true] b{color:#0A0A1E}
+.choice:disabled{opacity:.5;cursor:default}
+@media (max-width:900px){.opts{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -462,7 +486,9 @@ async function ensureQuiz(id) {
   if (!/^[a-z0-9-]+$/.test(id || "")) throw new Error("bad quiz id");
   window.QUIZ = null; await loadScript(`quizzes/${id}/quiz.js`);
   BANK = window.QUIZ; if (!BANK) throw new Error("no quiz");
-  SCORED = BANK.rounds.length - 1; BONUS_IDX = BANK.rounds.findIndex(r => r.type === "bonus");
+  SCORED = BANK.rounds.filter(r => r.type !== "tiebreak").length; BONUS_IDX = BANK.rounds.findIndex(r => r.type === "bonus");
+  BANK.rounds.forEach(r => r.questions.forEach(q => { if (q.opts && q.c !== undefined) q.a = q.opts[q.c]; }));
+  if (BANK.fonts && !document.getElementById("qfonts")) { const l = document.createElement("link"); l.id = "qfonts"; l.rel = "stylesheet"; l.href = BANK.fonts; document.head.appendChild(l); }
   document.title = BANK.title;
 }
 
@@ -503,6 +529,7 @@ function renderSoft() { if (softTimer) return; softTimer = setTimeout(() => { so
 const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9 ]/g, " ").replace(/\b(the|a|an)\b/g, " ").replace(/\s+/g, " ").trim();
 function lev(a, b) { const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let prev = Array.from({ length: n + 1 }, (_, i) => i); for (let i = 1; i <= m; i++) { const cur = [i]; for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; } return prev[n]; }
 function suggest(r, q, text) {
+  if (q.opts) return text === LET[q.c] ? 1 : 0;
   if (!text || q.closest || r.type === "picture" || r.type === "bonus" || r.type === "tiebreak") return 0;
   const t = norm(text); if (!t) return 0;
   const cands = [q.a.replace(/\s*\(.*\)\s*/g, ""), ...(q.acc || [])].map(norm).filter(Boolean);
@@ -528,7 +555,8 @@ function reviewHTML(ri) {
   const head = bonus ? "<th>Answer</th>" : r.questions.map((q, i) => `<th>Q${i + 1}</th>`).join("");
   const rows = S.teams.map(t => {
     const cells = r.questions.map((q, qi) => {
-      const txt = (ANS[t.id] && ANS[t.id][ri] && ANS[t.id][ri][qi]) || "";
+      let txt = (ANS[t.id] && ANS[t.id][ri] && ANS[t.id][ri][qi]) || "";
+      if (q.opts && txt) { const ix = LET.indexOf(txt); txt = ix >= 0 && q.opts[ix] ? txt + ": " + q.opts[ix] : txt; }
       if (bonus) return `<td><span class="ansv">${esc(txt) || "·"}</span></td>`;
       const defined = MARKS[t.id] && MARKS[t.id][ri] && MARKS[t.id][ri][qi] !== undefined; const eff = effMark(t.id, ri, qi);
       return `<td><span class="ansv">${esc(txt) || "·"}</span><button class="btn sm mk ${defined ? "" : "s"} ${eff > 0 ? "pri" : ""}" data-mk="${t.id}|${ri}|${qi}" aria-label="Mark ${esc(t.name)} question ${qi + 1}">${eff}${per > 1 ? "/" + per : ""}</button></td>`;
@@ -554,6 +582,7 @@ function cycleMark(tid, ri, qi) {
    board
    ===================================================================== */
 let boardLast = { scene: "", shown: -2 };
+const afterWord = i => BANK.rounds[i] && BANK.rounds[i].type === "bonus" ? "the bonus round" : i === SCORED - 1 ? "the final round" : "round " + (i + 1);
 function crumb() {
   const L = S.live;
   if (L.round < 0) return "Waiting to start";
@@ -566,9 +595,24 @@ function sideStandings() {
   const rows = standings(S.shown);
   return `<aside class="frame side" aria-label="Standings">
     <h3>Standings</h3>
-    <div class="sub" style="font-size:14px;color:var(--iv3)">After ${S.shown === BONUS_IDX ? "the bonus round" : "round " + (S.shown + 1)}</div>
+    <div class="sub" style="font-size:14px;color:var(--iv3)">After ${afterWord(S.shown)}</div>
     ${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${esc(r.name)}</span><span class="tt">${r.total}</span></div>`).join("")}
   </aside>`;
+}
+function visHTML(q, small) {
+  const v = q.vis; if (!v) return "";
+  const cls = "vis" + (small ? " sm" : "");
+  if (v.swatch) return `<div class="${cls} swatch" style="background:${esc(v.swatch)}" role="img" aria-label="Colour swatch"></div>`;
+  if (v.font) return `<div class="${cls} fontbox" style="font-family:'${esc(v.font)}',serif" role="img" aria-label="Sample text in a typeface">${esc(v.sample || "Pub Quiz Night")}</div>`;
+  if (v.flag) return `<div class="${cls} flagbox"><img src="https://flagcdn.com/w640/${esc(v.flag)}.png" alt="A national flag" referrerpolicy="no-referrer"></div>`;
+  if (v.svg) return `<div class="${cls} svgbox" role="img" aria-label="Silhouette">${v.svg}</div>`;
+  if (v.img) return `<div class="${cls} flagbox"><img src="${esc(v.img)}" alt="Picture" referrerpolicy="no-referrer"></div>`;
+  return "";
+}
+const LET = ["A", "B", "C", "D", "E", "F"];
+function optsHTML(q, reveal) {
+  if (!q.opts) return "";
+  return `<ol class="opts ${reveal ? "rev" : ""}">${q.opts.map((o, i) => `<li class="${reveal ? (i === q.c ? "right" : "wrong") : ""}"><b>${LET[i]}</b><span>${esc(o)}</span></li>`).join("")}</ol>`;
 }
 function stageHTML() {
   const L = S.live; const r = BANK.rounds[L.round]; const steps = buildSteps(L.round);
@@ -581,7 +625,10 @@ function stageHTML() {
   if (s.t === "q") {
     const q = r.questions[s.qi]; const n = r.questions.length;
     const label = r.type === "bonus" ? "The challenge" : r.type === "tiebreak" ? "Closest answer wins" : `Question ${s.qi + 1} of ${n}${s.phase === "answers" ? " · answers" : ""}`;
-    const photo = r.type === "picture" ? `<div class="photo">Look at the host's screen</div>` : "";
+    const photo = r.type === "picture" && !q.vis ? `<div class="photo">Look at the host's screen</div>` : "";
+    if (q.opts) {
+      return `<section class="frame stage mcq">${decoTop()}${eb(label)}<div class="mcqrow">${q.vis ? visHTML(q) : ""}<div class="mcqtxt"><p class="qtext ${q.vis ? "" : "wide"}">${esc(q.q)}</p>${optsHTML(q, s.reveal)}</div></div></section>`;
+    }
     const ans = s.reveal ? `<div class="ans"><small>Answer</small><b>${esc(q.a)}</b></div>` : "";
     return `<section class="frame stage">${decoTop()}${eb(label)}<p class="qtext ${r.type === "bonus" ? "wide" : ""}">${esc(q.q)}</p>${photo}${ans}</section>`;
   }
@@ -617,7 +664,7 @@ function standingsScene() {
     const pi = prevIdx[r.id] ? prevIdx[r.id].i : -1;
     return `<div class="trow num ${r.rank === 1 ? "top" : ""}" data-id="${r.id}" data-new="${i}" data-prev="${pi}"><div class="rk">${r.rank}${r.tie ? "=" : ""}${mvh}</div><div class="tn">${esc(r.name)}</div>${cells}<div class="tot">${r.total}</div></div>`;
   }).join("");
-  const lbl = through === BONUS_IDX ? "Final standings" : `After round ${through + 1}`;
+  const lbl = through === SCORED - 1 ? "Final standings" : `After round ${through + 1}`;
   return `<section class="frame stand">${deco() ? `<div class="crown" aria-hidden="true">${CROWN}</div>` : ""}<h2>${esc(lbl)}</h2><p class="sub2">${esc(BANK.rounds[through].title)}</p>
     <div style="--n:${n}"><div class="trow thead"><div>Rank</div><div>Team</div>${heads}<div style="text-align:right;padding-right:6px">Total</div></div><div id="rows" style="--n:${n}">${body}</div></div></section>`;
 }
@@ -710,7 +757,7 @@ function runTab() {
     top = `<div class="grid2">
       <div class="panel">
         <div class="now"><small>${esc(r.title)} · step ${c.i + 1} of ${c.steps.length} · ${esc(stepLabel(r, s))}</small>${esc(nowText)}</div>
-        ${q ? `<div class="ansbox"><small>Answer</small><b style="font-weight:500">${esc(q.a)}</b>${q.closest ? '<small style="margin-top:4px">Closest wins</small>' : ""}</div>` : ""}
+        ${q ? `<div class="ansbox"><small>Answer</small><b style="font-weight:500">${q.opts ? LET[q.c] + ": " : ""}${esc(q.a)}</b>${q.closest ? '<small style="margin-top:4px">Closest wins</small>' : ""}</div>` : ""}
         ${answersLine()}
         ${q && q.note ? `<p class="note">${esc(q.note)}</p>` : ""}
         ${q && q.flag ? `<div class="flag">${ic("flag")}${esc(q.flag)}</div>` : ""}
@@ -735,11 +782,11 @@ function runTab() {
   return top;
 }
 function scoreTab() {
-  const ri0 = Math.min(scoreRound, BANK.rounds.length - 2);
+  const ri0 = Math.min(scoreRound, SCORED - 1);
   return `<div style="display:flex;flex-direction:column;gap:20px">${scoreTabMain()}${reviewHTML(ri0)}</div>`;
 }
 function scoreTabMain() {
-  const ri = Math.min(scoreRound, BANK.rounds.length - 2); const r = BANK.rounds[ri];
+  const ri = Math.min(scoreRound, SCORED - 1); const r = BANK.rounds[ri];
   const min = r.min ?? 0, max = r.max;
   const chips = BANK.rounds.slice(0, SCORED).map((x, i) => `<button class="btn sm ${i === ri ? "pri" : ""}" data-sr="${i}" aria-label="${esc(x.title)}">${x.type === "bonus" ? "Bonus" : "R" + (i + 1)}${S.shown >= i ? " ✓" : ""}</button>`).join("");
   if (!S.teams.length) return `<div class="panel"><p class="note">Add teams first.</p><button class="btn" data-tab="teams" style="margin-top:10px">Add teams</button></div>`;
@@ -785,7 +832,7 @@ function settingsTab() {
     <div class="panel"><h3>Reset</h3>${confirmReset ? `<p class="note">This clears teams, scores and progress.</p><div class="row" style="margin-top:10px"><button class="btn danger" data-reset="yes">Clear everything</button><button class="btn" data-reset="no">Cancel</button></div>` : `<button class="btn danger" data-reset="ask">Start a new quiz</button>`}</div>
   </div><div style="display:flex;flex-direction:column;gap:20px">
     <div class="panel"><h3>Check before the night</h3><ul class="list spares">${flags.map(f => `<li><div>${esc(f.q.q)}<br><small>Round ${f.ri + 1}: ${esc(f.q.flag)}</small></div></li>`).join("")}</ul></div>
-    <div class="panel"><h3>Spare questions</h3><ul class="list spares">${BANK.spares.map(s => `<li><div>${esc(s.q)}<br><small>${esc(s.a)}${s.note ? " · " + esc(s.note) : ""}</small></div></li>`).join("")}</ul></div>
+    <div class="panel"><h3>Spare questions</h3><ul class="list spares">${(BANK.spares || []).map(s => `<li><div>${esc(s.q)}<br><small>${esc(s.a)}${s.note ? " · " + esc(s.note) : ""}</small></div></li>`).join("")}</ul></div>
   </div></div>`;
 }
 function hostHTML() {
@@ -877,7 +924,7 @@ async function copy(text, msg) {
    ===================================================================== */
 function setStatus(ri, qi) {
   const el = document.querySelector(`[data-st="${ri}-${qi}"]`); if (!el) return;
-  const v = ST[ri + "-" + qi]; el.textContent = v === "saved" ? "Saved" : v === "closed" ? "Too late, this question is closed" : v === "sending" ? "Saving" : "";
+  const v = ST[ri + "-" + qi]; el.textContent = v === "saved" ? "Saved" : v === "offline" ? "Offline. Tap again when reconnected." : v === "closed" ? "Too late, this question is closed" : v === "sending" ? "Saving" : "";
 }
 function visibleQs(ri) {
   const L = S.live; if (ri < 0 || !BANK) return [];
@@ -901,7 +948,7 @@ function playerHTML() {
   const L = S.live;
   if (playerTab === "scores") {
     if (S.shown < 0) body = `<p class="note">No scores yet.</p>`;
-    else { const rows = standings(S.shown); body = `<section class="frame psc" style="padding:16px"><div class="sub" style="font-size:14px;color:var(--iv3);margin-bottom:6px">After ${S.shown === BONUS_IDX ? "the bonus round" : "round " + (S.shown + 1)}</div>${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""} ${r.id === me.teamId ? "me" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${esc(r.name)}</span><span class="tt">${r.total}</span></div>`).join("")}</section>`; }
+    else { const rows = standings(S.shown); body = `<section class="frame psc" style="padding:16px"><div class="sub" style="font-size:14px;color:var(--iv3);margin-bottom:6px">After ${afterWord(S.shown)}</div>${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""} ${r.id === me.teamId ? "me" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${esc(r.name)}</span><span class="tt">${r.total}</span></div>`).join("")}</section>`; }
   } else if (L.round < 0) body = `<p class="note">The quiz has not started. Your answer sheet will appear here.</p>`;
   else {
     const ri = L.round; const r = BANK.rounds[ri]; const qs = visibleQs(ri);
@@ -909,7 +956,12 @@ function playerHTML() {
       (qs.length ? qs.map(qi => {
         const q = r.questions[qi]; const open = answerOpen(ri, qi); const v = (MY[ri] && MY[ri][qi]) || "";
         const label = r.type === "picture" ? "Picture " + (qi + 1) : r.type === "bonus" ? "Stations, in order" : "Question " + (qi + 1);
-        const txt = r.type === "picture" ? "" : `<p class="qt">${esc(q.q)}</p>`;
+        const txt = r.type === "picture" && !q.opts ? "" : `<p class="qt">${esc(q.q)}</p>`;
+        if (q.opts) {
+          const pick = v;
+          const ch = q.opts.map((o, i) => `<button class="choice" data-fk="c-${ri}-${qi}-${i}" data-pick="${ri}|${qi}|${LET[i]}" aria-pressed="${pick === LET[i]}" ${open ? "" : "disabled"}><b>${LET[i]}</b><span>${esc(o)}</span></button>`).join("");
+          return `<div class="qline ${open ? "" : "locked"}"><p class="qn">${label}${open ? "" : " · closed"}</p>${visHTML(q, true)}${txt}<div class="choices">${ch}</div><div class="st" data-st="${ri}-${qi}" role="status"></div></div>`;
+        }
         const field = r.type === "bonus" ? `<textarea data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" placeholder="One station per line">${esc(v)}</textarea>` : `<input data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" autocomplete="off" autocapitalize="sentences" value="${esc(v)}">`;
         return `<div class="qline ${open ? "" : "locked"}"><p class="qn">${label}${open ? "" : " · closed"}</p>${txt}${field}<div class="st" data-st="${ri}-${qi}" role="status"></div></div>`;
       }).join("") : `<p class="note" style="padding:8px 0 14px">Waiting for the first question.</p>`) + `</section>`;
@@ -922,6 +974,11 @@ function renderPlayer() {
   if (fk) { const el = $(`[data-fk="${fk}"]`); if (el && !el.disabled) { if (val !== null && el.dataset.pa) el.value = val; el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
   $$("[data-st]").forEach(el => { const [a, b] = el.dataset.st.split("-"); setStatus(a, b); });
 }
+function sendAnswerNow(ri, qi, text) {
+  MY[ri] = MY[ri] || {}; MY[ri][qi] = text; ST[ri + "-" + qi] = "sending";
+  if (!Net.send({ t: "ans", round: ri, qi, text })) ST[ri + "-" + qi] = "offline";
+  try { localStorage.setItem("pq:my:" + code, JSON.stringify(MY)); } catch (e) {}
+}
 let sendTimers = {};
 function sendAnswer(ri, qi, text) {
   MY[ri] = MY[ri] || {}; MY[ri][qi] = text; ST[ri + "-" + qi] = "sending"; setStatus(ri, qi);
@@ -933,6 +990,7 @@ document.addEventListener("input", e => { if (role !== "player") return; const e
 document.addEventListener("click", e => {
   if (role !== "player") return; const t = e.target.closest("button"); if (!t) return; const d = t.dataset;
   if (d.ptab) { playerTab = d.ptab; return render(); }
+  if (d.pick) { const [ri, qi, L] = d.pick.split("|"); if (t.disabled) return; sendAnswerNow(+ri, +qi, L); return render(); }
   if (d.pj) { const tm = S.teams.find(x => x.id === d.pj); joining = true; joinError = ""; Net.send({ t: "hello", teamId: d.pj, name: tm && tm.name }); return render(); }
   if (d.pjn !== undefined) { const v = ($("#pname") || {}).value || ""; if (!v.trim()) { joinError = "Enter a team name."; return render(); } joining = true; joinError = ""; if (!Net.send({ t: "hello", name: v })) { joining = false; joinError = "Not connected yet. Try again in a moment."; } return render(); }
   if (d.pleave !== undefined) { me = null; MY = {}; try { localStorage.removeItem("pq:me:" + code); localStorage.removeItem("pq:my:" + code); } catch (e) {} return render(); }

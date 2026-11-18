@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&family=Poiret+One&display=swap" rel="stylesheet">
 <script src="vendor/peerjs.min.js"></script>
 <script src="vendor/qrcode.js"></script>
+<script src="vendor/supabase.js"></script>
 <style>
 :root{
   --bg:#0A0A1E; --s1:#11112B; --s2:#1A1A3A; --s3:#232348;
@@ -368,14 +369,13 @@ const stepShort = (r, s, i) => s.t === "q" ? `${s.qi + 1}${s.reveal ? "a" : ""}`
    network: the host's browser is the server. Friends connect to it directly
    (WebRTC via PeerJS) using a short room code. No accounts, no database.
    ===================================================================== */
+const QP = new URLSearchParams(location.search);
+const USE = { bc: !QP.has("nobc"), relay: !QP.has("norelay"), p2p: !QP.has("nop2p") };
+const RELAY = { url: "https://axmzxphxcgwrsbkixmbg.supabase.co", key: "sb_publishable_bcqkFGvCkSS5-sY8f6xLyQ_Am-8ngTZ" };
 const PEER_OPTS = (() => {
-  const q = new URLSearchParams(location.search).get("broker"); // dev only: ?broker=localhost:9000
-  const config = { iceServers: [
-    { urls: "stun:stun.l.google.com:19302" }, { urls: "stun:global.stun.twilio.com:3478" },
-    { urls: ["turn:openrelay.metered.ca:80", "turn:openrelay.metered.ca:443", "turns:openrelay.metered.ca:443?transport=tcp"], username: "openrelayproject", credential: "openrelayproject" }
-  ] };
-  if (!q) return { debug: 0, config };
-  const [host, port] = q.split(":"); return { host, port: +port, path: "/", secure: false, debug: 0, config };
+  const q = QP.get("broker"); // dev only: ?broker=localhost:9000
+  if (!q) return { debug: 0 };
+  const [host, port] = q.split(":"); return { host, port: +port, path: "/", secure: false, debug: 0 };
 })();
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const newCode = () => Array.from({ length: 5 }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join("");
@@ -383,79 +383,189 @@ const peerId = c => "pubquiz-" + c;
 let clockSkew = 0, code = "", quizId = "";
 const nowSynced = () => Date.now() + clockSkew;
 
+/* ---------------------------------------------------------------------
+   Connections. Three paths run side by side; whichever reaches the host
+   first wins, and duplicates are ignored.
+   1. local: BroadcastChannel, for a board window on the host's own computer
+   2. relay: Supabase Realtime over a normal https websocket (works on
+      almost any wifi or mobile network)
+   3. direct: PeerJS / WebRTC peer to peer, as a backup
+   Every message is wrapped: { f: sender id, to: target id or null, hs, m }.
+   --------------------------------------------------------------------- */
 const Net = {
-  status: "connecting", peer: null, conns: new Set(), watchers: 0, conn: null,
-  lastMsg: 0, gen: 0, diag: "", pushTimer: null, tries: 0, intervals: [],
-  clear() { this.intervals.forEach(clearInterval); this.intervals = []; try { this.peer && this.peer.destroy(); } catch (e) {} this.conns.clear(); this.watchers = 0; this.gen++; },
+  status: "connecting", watchers: 0, diag: "", lastMsg: 0, gen: 0, intervals: [], pushTimer: null, started: 0,
+  id: uid() + uid(), hs: uid() + uid(), hostHs: "", lastRev: -1,
+  bc: null, sb: null, up: null, down: null, relay: "off", peer: null, conns: new Set(), conn: null, direct: "off", tries: 0,
+  clients: new Map(),
+  clear() {
+    this.intervals.forEach(clearInterval); this.intervals = []; this.gen++;
+    try { this.bc && this.bc.close(); } catch (e) {} this.bc = null;
+    try { this.sb && this.sb.removeAllChannels(); } catch (e) {} this.sb = this.up = this.down = null;
+    try { this.peer && this.peer.destroy(); } catch (e) {} this.peer = null; this.conns.clear(); this.conn = null;
+    this.clients.clear(); this.watchers = 0; this.relay = this.direct = "off";
+  },
   set(st) { if (this.status !== st) { this.status = st; render(); } },
+  paths() { return `local ${this.bc ? "on" : "off"} · relay ${this.relay} · direct ${this.direct}`; },
+
+  /* ----- relay (Supabase Realtime broadcast) ----- */
+  relayJoin(c, isHost, onEnv, g) {
+    if (!USE.relay || !window.supabase) { this.relay = "unavailable"; return; }
+    try {
+      const sb = this.sb = window.supabase.createClient(RELAY.url, RELAY.key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }, realtime: { params: { eventsPerSecond: 20 } } });
+      const opts = { config: { broadcast: { self: false, ack: false } } };
+      const down = this.down = sb.channel("quizard-" + c + "-down", opts);
+      const up = this.up = sb.channel("quizard-" + c + "-up", opts);
+      const listen = isHost ? up : down;
+      listen.on("broadcast", { event: "m" }, ({ payload }) => { if (g === this.gen) onEnv(payload); });
+      this.relay = "connecting";
+      const sub = (ch, onState) => ch.subscribe(st => { if (g !== this.gen) return; onState(st); });
+      if (isHost) {
+        let a = false, b = false;
+        const upd = () => { this.relay = a && b ? "on" : "connecting"; this.hostStatus(); };
+        sub(up, st => { a = st === "SUBSCRIBED"; upd(); });
+        sub(down, st => { b = st === "SUBSCRIBED"; upd(); });
+      } else {
+        sub(down, st => { this.relay = st === "SUBSCRIBED" ? "on" : st === "CHANNEL_ERROR" || st === "TIMED_OUT" ? "retrying" : "connecting"; if (st === "SUBSCRIBED") this.hi(); render(); });
+      }
+    } catch (e) { this.relay = "error"; }
+  },
+  relayOut(env, toHost) {
+    if (!this.sb) return false;
+    try {
+      if (toHost) {
+        const ch = this.up;
+        const fallback = () => ch.send({ type: "broadcast", event: "m", payload: env }).catch(() => {});
+        if (ch.httpSend) ch.httpSend("m", env).catch(fallback); else fallback();
+      } else this.down.send({ type: "broadcast", event: "m", payload: env }).catch(() => {});
+      return true;
+    } catch (e) { return false; }
+  },
 
   /* ----- host ----- */
   host(c) {
-    this.clear(); const g = this.gen; this.tries = 0;
+    this.clear(); const g = this.gen; this.started = Date.now();
+    const onEnv = (via, env) => { if (g === this.gen && env && env.to === "host" && env.f) this.fromClient(via, env.f, env.m); };
+    if (USE.bc && window.BroadcastChannel) { this.bc = new BroadcastChannel("quizard-" + c); this.bc.onmessage = e => onEnv("bc", e.data); }
+    this.relayJoin(c, true, env => onEnv("relay", env), g);
+    if (USE.p2p && window.Peer) this.p2pHost(c, g, onEnv);
+    this.intervals.push(setInterval(() => { this.broadcast({ t: "ping" }); this.count(); this.hostStatus(); }, 10000));
+    this.broadcast({ t: "state", s: S });
+    this.hostStatus(); setTimeout(() => { if (g === this.gen) this.hostStatus(); }, 15000);
+  },
+  hostStatus() {
+    const net = this.relay === "on" || this.direct === "on";
+    this.set(net ? "live" : Date.now() - this.started > 14000 ? "offline" : "connecting");
+  },
+  p2pHost(c, g, onEnv) {
+    this.direct = "connecting";
     const open = () => {
       if (g !== this.gen) return;
       const p = this.peer = new Peer(peerId(c), PEER_OPTS);
-      p.on("open", () => { if (g === this.gen) this.set("live"); });
+      p.on("open", () => { if (g === this.gen) { this.direct = "on"; this.tries = 0; this.hostStatus(); } });
       p.on("connection", conn => {
-        conn.on("open", () => { this.conns.add(conn); this.sendTo(conn); this.count(); });
-        conn.on("data", m => handleHostMsg(conn, m));
-        conn.on("close", () => { this.conns.delete(conn); this.count(); });
-        conn.on("error", () => { this.conns.delete(conn); this.count(); });
+        conn.on("open", () => { this.conns.add(conn); this.out(conn, null, { t: "state", s: S }); });
+        conn.on("data", env => onEnv(conn, env));
+        const drop = () => { this.conns.delete(conn); };
+        conn.on("close", drop); conn.on("error", drop);
       });
-      p.on("disconnected", () => { if (g !== this.gen) return; this.set("reconnecting"); setTimeout(() => { try { p.reconnect(); } catch (e) {} }, 1500); });
+      p.on("disconnected", () => { if (g !== this.gen) return; this.direct = "reconnecting"; this.hostStatus(); setTimeout(() => { try { p.reconnect(); } catch (e) {} }, 2000); });
       p.on("error", err => {
         if (g !== this.gen) return;
-        if (err.type === "unavailable-id") {
-          this.set("reclaiming");
-          if (++this.tries < 10) setTimeout(() => { try { p.destroy(); } catch (e) {} open(); }, 3000); else this.set("taken");
-        } else if (["network", "server-error", "socket-error", "socket-closed"].includes(err.type)) this.set("offline");
+        if (err.type === "unavailable-id") { this.direct = "waiting for old room"; if (++this.tries < 20) setTimeout(() => { try { p.destroy(); } catch (e) {} open(); }, 5000); }
+        else if (["network", "server-error", "socket-error", "socket-closed"].includes(err.type)) { this.direct = "unavailable"; this.hostStatus(); setTimeout(() => { if (g === this.gen && this.direct !== "on") { try { p.destroy(); } catch (e) {} open(); } }, 15000); }
       });
     };
     open();
-    this.intervals.push(setInterval(() => this.broadcast({ t: "ping", now: Date.now() }), 10000));
   },
-  sendTo(conn) { try { conn.send({ t: "state", s: S, now: Date.now() }); } catch (e) {} },
-  broadcast(msg) { this.conns.forEach(c => { try { c.send(msg); } catch (e) {} }); },
-  count() { this.watchers = this.conns.size; render(); },
+  fromClient(via, id, m) {
+    if (!m || typeof m !== "object") return;
+    let cl = this.clients.get(id);
+    const isNew = !cl;
+    if (!cl) { cl = { id, last: 0 }; this.clients.set(id, cl); }
+    cl.via = via; cl.last = Date.now(); cl.send = msg => this.out(cl.via, cl.id, msg);
+    if (m.t === "hi") { cl.send({ t: "state", s: S }); if (isNew) this.count(); return; }
+    handleHostMsg(cl, m);
+  },
+  out(via, to, m) {
+    m.now = Date.now(); const env = { f: "host", to, hs: this.hs, m };
+    try {
+      if (via === "bc") this.bc && this.bc.postMessage(env);
+      else if (via === "relay") this.relayOut(env, false);
+      else if (via && via.send) via.send(env);
+    } catch (e) {}
+  },
+  broadcast(m) {
+    this.out("bc", null, m); this.out("relay", null, Object.assign({}, m));
+    this.conns.forEach(c => this.out(c, null, Object.assign({}, m)));
+  },
+  count() {
+    const now = Date.now(); let n = 0;
+    this.clients.forEach((cl, id) => { if (now - cl.last < 40000) n++; else this.clients.delete(id); });
+    if (n !== this.watchers) { this.watchers = n; render(); }
+  },
   push() {
     if (this.pushTimer) return;
-    this.pushTimer = setTimeout(() => { this.pushTimer = null; this.conns.forEach(c => this.sendTo(c)); }, 60);
+    this.pushTimer = setTimeout(() => { this.pushTimer = null; this.broadcast({ t: "state", s: S }); }, 80);
   },
 
-  /* ----- board ----- */
+  /* ----- board and phones ----- */
   board(c) {
-    this.clear(); const g = this.gen;
+    this.clear(); const g = this.gen; this.started = Date.now();
+    const onEnv = env => { if (g !== this.gen || !env || env.f !== "host") return; if (env.to && env.to !== this.id) return; this.onMsg(env.m, env.hs); };
+    if (USE.bc && window.BroadcastChannel) { this.bc = new BroadcastChannel("quizard-" + c); this.bc.onmessage = e => onEnv(e.data); }
+    this.relayJoin(c, false, onEnv, g);
+    if (USE.p2p && window.Peer) this.p2pBoard(c, g, onEnv);
+    this.hi();
+    this.intervals.push(setInterval(() => {
+      const age = Date.now() - this.lastMsg;
+      if (this.status === "live" && age > 25000) this.set("reconnecting");
+      else if (this.status === "connecting" && Date.now() - this.started > 9000) this.set("waiting");
+      if (this.status !== "live" || age > 12000) this.hi();
+      if (this.status !== "live") render();
+    }, 3000));
+    this.intervals.push(setInterval(() => this.hi(), 15000));
+  },
+  p2pBoard(c, g, onEnv) {
+    let wait = 3000;
     const connect = () => {
       if (g !== this.gen) return;
       try { this.peer && this.peer.destroy(); } catch (e) {}
-      const p = this.peer = new Peer(PEER_OPTS);
-      const retry = (st, ms) => { if (g !== this.gen) return; this.set(st); setTimeout(connect, ms); };
+      const p = this.peer = new Peer(PEER_OPTS); this.direct = "connecting";
+      const retry = (st, ms) => { if (g !== this.gen) return; this.direct = st; try { p.destroy(); } catch (e) {} setTimeout(connect, ms); };
       p.on("open", () => {
         if (g !== this.gen) return;
-        const conn = this.conn = p.connect(peerId(c), { reliable: true });
-        this.diag = "broker ok, calling host"; render();
-        conn.on("iceStateChanged", s => { this.diag = "broker ok, connection " + s; if (this.status !== "live") render(); });
-        conn.on("error", e => { this.diag = "connection error: " + (e && e.type || e); });
-        const to = setTimeout(() => { if (g === this.gen && this.conn === conn && this.status !== "live") { this.diag += " (timed out)"; retry("reconnecting", 0); } }, 20000);
-        conn.on("open", () => { clearTimeout(to); if (g === this.gen) { this.lastMsg = Date.now(); this.set("live"); if (role === "player" && me) conn.send({ t: "hello", teamId: me.teamId }); } });
-        conn.on("data", m => { if (g === this.gen) this.onMsg(m); });
-        conn.on("close", () => retry("reconnecting", 2000));
+        const conn = p.connect(peerId(c), { reliable: true });
+        const to = setTimeout(() => { if (g === this.gen && this.conn !== conn) retry("timed out", wait = Math.min(wait * 2, 30000)); }, 15000);
+        conn.on("open", () => { clearTimeout(to); if (g !== this.gen) return; this.conn = conn; this.direct = "on"; wait = 3000; this.hi(); });
+        conn.on("data", env => onEnv(env));
+        conn.on("close", () => { if (this.conn === conn) this.conn = null; retry("reconnecting", 3000); });
       });
-      p.on("error", err => { this.diag = "error: " + err.type; if (err.type === "peer-unavailable") retry("waiting", 4000); else retry("offline", 5000); });
+      p.on("error", err => retry(err.type === "peer-unavailable" ? "host not found" : "unavailable", wait = Math.min(wait * 2, 30000)));
     };
-    this.diag = "contacting broker"; connect();
-    this.intervals.push(setInterval(() => { if (this.status === "live" && Date.now() - this.lastMsg > 30000) { this.set("reconnecting"); connect(); } }, 5000));
+    connect();
   },
-  send(msg) { try { if (this.conn && this.conn.open) { this.conn.send(msg); return true; } } catch (e) {} return false; },
-  onMsg(m) {
-    this.lastMsg = Date.now();
+  hi() { this.send({ t: "hi" }); },
+  send(m) {
+    const env = { f: this.id, to: "host", m };
+    let any = false;
+    try { if (this.bc) { this.bc.postMessage(env); } } catch (e) {}
+    if (this.relay === "on" && this.relayOut(env, true)) any = true;
+    try { if (this.conn && this.conn.open) { this.conn.send(env); any = true; } } catch (e) {}
+    return any || (this.status === "live" && !!this.bc);
+  },
+  onMsg(m, hs) {
+    if (!m) return;
+    if (hs && hs !== this.hostHs) { this.hostHs = hs; this.lastRev = -1; }
+    const wasLive = this.status === "live";
+    this.lastMsg = Date.now(); this.set("live");
     if (m.now) clockSkew = m.now - Date.now();
-    if (m.t === "state") onState(m.s);
+    if (!wasLive && role === "player" && me) this.send({ t: "hello", teamId: me.teamId });
+    if (m.t === "state") { if (!m.s || (m.s.rev || 0) < this.lastRev) return; this.lastRev = m.s.rev || 0; onState(m.s); }
     else if (m.t === "welcome" && role === "player") {
       me = { teamId: m.teamId }; joining = false; joinError = "";
       try { localStorage.setItem("pq:me:" + code, JSON.stringify(me)); } catch (e) {}
       const theirs = m.answers || {};
-      Object.keys(MY).forEach(ri => Object.keys(MY[ri]).forEach(qi => { if (MY[ri][qi] && (!theirs[ri] || theirs[ri][qi] !== MY[ri][qi])) Net.send({ t: "ans", round: +ri, qi: +qi, text: MY[ri][qi] }); }));
+      Object.keys(MY).forEach(ri => Object.keys(MY[ri]).forEach(qi => { if (MY[ri][qi] && (!theirs[ri] || theirs[ri][qi] !== MY[ri][qi])) this.send({ t: "ans", round: +ri, qi: +qi, text: MY[ri][qi] }); }));
       Object.keys(theirs).forEach(ri => Object.keys(theirs[ri]).forEach(qi => { MY[ri] = MY[ri] || {}; if (!MY[ri][qi]) MY[ri][qi] = theirs[ri][qi]; }));
       render();
     } else if (m.t === "nope") { joining = false; joinError = "Could not join. Check the team name and try again."; render(); }
@@ -706,11 +816,11 @@ function joinPanel() {
 }
 function netText() {
   const st = Net.status;
-  if (role === "host") return { live: "Online", connecting: "Connecting", reconnecting: "Reconnecting", reclaiming: "Reclaiming this room", taken: "Room code is in use", offline: "Offline: friends cannot connect" }[st] || "";
+  if (role === "host") return { live: "Online", connecting: "Connecting", offline: "Offline: phones cannot connect (a board on this computer still works)" }[st] || "";
   return { live: "Connected", connecting: "Connecting", reconnecting: "Reconnecting", waiting: "Waiting for the host", offline: "Offline" }[st] || "";
 }
 function netChip() {
-  const bad = ["offline", "taken", "reclaiming", "reconnecting"].includes(Net.status);
+  const bad = Net.status !== "live";
   return `<span class="chip"><span class="dot ${bad ? "bad" : "ok"}"></span>Room <b class="num" style="font-weight:500">${esc(code)}</b> · ${Net.watchers} watching · ${esc(netText())}</span>`;
 }
 function curStep() {
@@ -1004,8 +1114,8 @@ function message(title, body, action) {
 }
 function render() {
   if ((role === "board" || role === "player") && !BANK) {
-    const waiting = { waiting: "Waiting for the host to open the room. Check the room code, and that the host tab is open and says Online.", offline: "Cannot reach the connection service. Check your internet connection. Retrying.", reconnecting: "Could not reach the host yet. Still trying. If this lasts, switch between wifi and mobile data." }[Net.status] || "Connecting to the room.";
-    return message(`Room ${code}`, waiting, `<div class="skeleton" style="width:70%;margin-top:14px"></div><p class="note" style="margin-top:12px;font-size:13px">Details: ${esc(Net.diag)}</p><button class="btn" style="margin-top:12px" onclick="location.reload()">Reload</button>`);
+    const waiting = { waiting: "No reply from the host yet. Check the room code, and that the host's quiz tab is open and says Online. Still trying.", reconnecting: "Lost the host. Reconnecting." }[Net.status] || "Connecting to the room.";
+    return message(`Room ${code}`, waiting, `<div class="skeleton" style="width:70%;margin-top:14px"></div><p class="note" style="margin-top:12px;font-size:13px">Connection: ${esc(Net.paths())}</p><button class="btn" style="margin-top:12px" onclick="location.reload()">Reload</button>`);
   }
   document.body.classList.toggle("theme-deco", deco());
   if (role === "host") renderHost(); else if (role === "player") renderPlayer(); else renderBoard();

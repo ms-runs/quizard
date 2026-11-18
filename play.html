@@ -799,7 +799,7 @@ function renderBoard() {
     const side = sideStandings();
     body = `<div class="bbody ${side ? "split" : ""}">${stageHTML()}${side}</div>`;
   }
-  $("#app").innerHTML = `<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`;
+  setApp(`<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`);
   tickClock();
   if (scene === "scores" && (boardLast.scene !== "scores" || boardLast.shown !== S.shown)) animateRows();
   boardLast = { scene, shown: S.shown };
@@ -871,8 +871,8 @@ function runTab() {
         ${answersLine()}
         ${q && q.note ? `<p class="note">${esc(q.note)}</p>` : ""}
         ${q && q.flag ? `<div class="flag">${ic("flag")}${esc(q.flag)}</div>` : ""}
-        ${s.t === "intro" ? `<p class="note">${esc(r.note)}</p>` : ""}
-        ${s.t === "finale" ? `<p class="note">${esc(r.note)}</p>` : ""}
+        ${s.t === "intro" && r.note ? `<p class="note">${esc(r.note)}</p>` : ""}
+        ${s.t === "finale" && r.note ? `<p class="note">${esc(r.note)}</p>` : ""}
         <div class="ctrls" style="margin-top:16px">
           <button class="btn ico" data-act="back" aria-label="Previous step" ${c.i === 0 ? "disabled" : ""}>${ic("left")}</button>
           ${canReveal ? `<button class="btn" data-act="reveal">${ic("eye")}Reveal answer</button>` : ""}
@@ -960,7 +960,7 @@ function hostHTML() {
 }
 function renderHost() {
   const ae = document.activeElement; const fk = ae && ae.dataset && ae.dataset.fk; const pos = ae && ae.selectionStart;
-  $("#app").innerHTML = hostHTML();
+  if (!setApp(hostHTML())) return tickClock();
   if (fk) { const el = $(`[data-fk="${fk}"]`); if (el) { el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
   tickClock();
 }
@@ -1080,7 +1080,7 @@ function playerHTML() {
 }
 function renderPlayer() {
   const ae = document.activeElement; const fk = ae && ae.dataset && ae.dataset.fk; const pos = ae && ae.selectionStart; const val = ae && ae.tagName.match(/INPUT|TEXTAREA/) ? ae.value : null;
-  $("#app").innerHTML = playerHTML();
+  if (!setApp(playerHTML())) return;
   if (fk) { const el = $(`[data-fk="${fk}"]`); if (el && !el.disabled) { if (val !== null) el.value = val; el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
   $$("[data-st]").forEach(el => { const [a, b] = el.dataset.st.split("-"); setStatus(a, b); });
 }
@@ -1110,8 +1110,10 @@ document.addEventListener("click", e => {
 /* =====================================================================
    boot
    ===================================================================== */
+let lastHTML = "";
+function setApp(html) { if (html === lastHTML) return false; lastHTML = html; $("#app").innerHTML = html; return true; }
 function message(title, body, action) {
-  $("#app").innerHTML = `<div class="center"><div class="panel"><h3>${esc(title)}</h3><p class="note">${esc(body)}</p>${action || ""}</div></div>`;
+  setApp(`<div class="center"><div class="panel"><h3>${esc(title)}</h3><p class="note">${esc(body)}</p>${action || ""}</div></div>`);
 }
 function render() {
   if ((role === "board" || role === "player") && !BANK) {

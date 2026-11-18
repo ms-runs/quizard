@@ -252,6 +252,96 @@ body.theme-deco{background-color:var(--bg);background-image:url("data:image/svg+
 .choice[aria-pressed=true] b{color:#0A0A1E}
 .choice:disabled{opacity:.5;cursor:default}
 @media (max-width:900px){.opts{grid-template-columns:1fr}}
+
+/* ---------- logos ---------- */
+.tlogo{width:1.7em;height:1.7em;border-radius:50%;object-fit:cover;flex:none;display:inline-grid;place-items:center;color:#fff;font-weight:500;font-size:.62em;line-height:1;letter-spacing:.02em;border:1px solid var(--line);vertical-align:middle}
+img.tlogo{font-size:1em;width:1.7em;height:1.7em}
+.tlogo.ini{width:2.75em;height:2.75em}
+.trow .tn,.srow .tn,.tcell,.pteam,.tpick{display:flex;align-items:center;gap:.6em;min-width:0}
+.trow .tn span,.srow .tn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trow .tn .tlogo{font-size:1em}.trow .tn .tlogo.ini{font-size:.62em}
+.lobbyteams{display:flex;flex-wrap:wrap;gap:clamp(12px,1.6vw,24px)}
+.lt{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:130px;text-align:center;font-size:clamp(14px,1.3vw,19px);color:var(--iv2)}
+.tlogo.lg{width:clamp(56px,5.6vw,92px);height:clamp(56px,5.6vw,92px);font-size:clamp(20px,2vw,32px)}
+.list li .tlogo{font-size:28px}
+.pteam{font-size:18px}.pteam .tlogo{font-size:24px}
+.tpick{justify-content:flex-start}.tpick .tlogo{font-size:22px}
+.ph2{margin:0 0 6px;font-weight:500;font-size:22px}
+/* drawing pad */
+.pad{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:8px}
+#pad{width:min(72vw,280px);height:min(72vw,280px);border-radius:50%;touch-action:none;border:2px solid var(--gold);cursor:crosshair;background:#1F2A5A}
+.padtools{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
+.sw{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}
+.sw small{color:var(--iv3);margin-right:4px}
+.pdot{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
+.pdot.sq{border-radius:6px;width:30px;height:30px}
+.pdot.on{outline:2px solid var(--gold);outline-offset:2px}
+/* phone: earlier questions compact */
+.earlier{border-top:1px solid var(--line);margin-top:6px}
+.eh{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--iv3);margin:14px 0 2px}
+.qline.past{padding:10px 0}
+.qline.past .qn{font-size:12px}
+.qline.past .qt{font-size:14px;color:var(--iv2);margin:0 0 6px}
+.qline.past input,.qline.past textarea{min-height:40px;font-size:15px;padding:6px 10px}
+.qline.past textarea{min-height:80px}
+.minirow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.choice.mini{width:auto;min-height:40px;min-width:44px;padding:6px 10px;justify-content:center}
+.picked{font-size:14px;color:var(--iv2);margin-left:4px}
+.qline.conn{border:1px solid var(--gold);padding:14px;margin:8px 0;background:rgba(212,175,55,.06)}
+/* TV: finished question shrinks */
+.stage .qtext{transition:font-size .5s var(--ease)}
+.stage.done .qtext{font-size:clamp(20px,2.4vw,38px);color:var(--iv2)}
+.stage.mcq.done .qtext{font-size:clamp(18px,2vw,32px)}
+/* overflow fixes */
+.big,.qtext,.ans b,.opts li span{overflow-wrap:anywhere;hyphens:auto}
+.big.long{font-size:clamp(34px,5.4vw,88px)}
+.opts li{min-width:0}
+.opts li span{min-width:0}
+.opts.l li{font-size:clamp(15px,1.6vw,24px)}
+.opts.xl{grid-template-columns:1fr}
+.opts.xl li{font-size:clamp(15px,1.5vw,22px)}
+.mcqtxt{min-width:0}
+/* pantone chip */
+.vis.pchip{aspect-ratio:auto;width:clamp(190px,22vw,340px);display:flex;flex-direction:column;background:#fff;border:0;box-shadow:0 18px 40px rgba(0,0,0,.45);overflow:hidden}
+.pchip .pcol{aspect-ratio:1/1.05;width:100%}
+.pchip .plab{background:#fff;color:#111;padding:12px 14px 16px;display:flex;flex-direction:column;gap:2px;font-family:Helvetica,Arial,sans-serif;text-align:left}
+.pchip .plab b{font-weight:800;letter-spacing:.02em;font-size:clamp(15px,1.4vw,22px)}
+.pchip .pcode{font-size:clamp(13px,1.1vw,17px)}
+.pchip .pname{font-size:clamp(13px,1.1vw,17px);color:#444;min-height:1.3em}
+.vis.sm.pchip{width:150px;margin:0 auto 12px}
+.lay-pantone .mcqrow{gap:clamp(28px,5vw,80px)}
+/* gallery frame for the picture round */
+.vis.gal{aspect-ratio:auto;width:clamp(260px,40vw,640px);border:0;background:none;margin:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.galmat{width:100%;padding:clamp(12px,1.6vw,24px);background:linear-gradient(145deg,#b8902c,#f3d67a 45%,#8a6a1c);box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.galin{background:#F2EDDC;padding:clamp(14px,2vw,30px);aspect-ratio:4/3;display:grid;place-items:center}
+.galin svg{width:100%;height:100%;display:block}
+.galin svg [fill="#F2EDDC"],.galin svg{fill:#141428}
+.galin svg [fill="#0A0A1E"]{fill:#F2EDDC}
+.galin img{width:100%;height:100%;object-fit:contain}
+.gal figcaption{font-size:clamp(12px,1vw,15px);letter-spacing:.14em;text-transform:uppercase;color:var(--iv3);border:1px solid var(--line);padding:4px 12px}
+.vis.sm.gal{width:100%;max-width:280px;margin:0 auto 12px}
+/* type specimen */
+.vis.spec{aspect-ratio:3/4;width:clamp(220px,26vw,400px);background:#F2EDDC;color:#141428;border:0;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(14px,1.6vw,26px);box-shadow:0 18px 40px rgba(0,0,0,.45);text-align:left;place-items:stretch}
+.spec small{font-size:clamp(11px,.9vw,14px);letter-spacing:.14em;text-transform:uppercase;color:#6b6450}
+.specaa{font-size:clamp(70px,9vw,150px);line-height:1}
+.spectx{font-size:clamp(22px,2.4vw,38px);line-height:1.1;overflow-wrap:anywhere}
+.specfoot{text-transform:none!important;letter-spacing:0!important;font-size:clamp(12px,1vw,16px)!important}
+.vis.sm.spec{width:200px;margin:0 auto 12px}
+.vis.sm.spec .specaa{font-size:64px}.vis.sm.spec .spectx{font-size:22px}
+/* flags: gentle wave */
+.flagbox{background:transparent;border:0}
+.flagin{width:92%;height:auto;filter:drop-shadow(0 12px 18px rgba(0,0,0,.45));animation:wave 5s ease-in-out infinite;transform-origin:left center}
+.flagin img{width:100%;display:block}
+@keyframes wave{0%,100%{transform:skewY(0) scaleX(1)}50%{transform:skewY(-1.5deg) scaleX(.98)}}
+@media (prefers-reduced-motion:reduce){.flagin{animation:none}}
+/* illustration icons */
+.vis.iconbox{color:var(--gold);background:radial-gradient(circle at 50% 50%,rgba(212,175,55,.14),transparent 62%),var(--bg);border:1px solid var(--line)}
+.iconbox svg{width:46%;height:46%;stroke-width:1.25}
+.vis.sm.iconbox{max-width:160px;aspect-ratio:4/3}
+.lobby{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center}
+.lobl{display:flex;flex-direction:column;gap:clamp(14px,2vw,26px);min-width:0}
+.lobr .joinrow{flex-direction:column;align-items:flex-start;gap:18px}
+@media (max-width:900px){.lobby{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -259,7 +349,7 @@ body.theme-deco{background-color:var(--bg);background-image:url("data:image/svg+
 
 <script>
 /* The question bank loads from quizzes/<id>/quiz.js */
-let BANK = null, SCORED = 0, BONUS_IDX = -1;
+let BANK = null, SCORED = 0, BONUS_IDX = -1, HALF_IDX = -1;
 /* =====================================================================
    helpers
    ===================================================================== */
@@ -279,6 +369,19 @@ function qrSVG(text) {
     return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" role="img" aria-label="QR code to join this quiz"><path d="${d}" fill="#0A0A1E"/></svg>`;
   } catch (e) { return ""; }
 }
+const LCOL = ["#C8553D", "#2F6690", "#3A7D44", "#8E44AD", "#B8860B", "#E07A5F", "#4361EE", "#2A9D8F"];
+const okLogo = v => typeof v === "string" && v.length < 40000 && /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(v);
+function logoHTML(t, cls) {
+  if (!t) return "";
+  if (okLogo(t.logo)) return `<img class="tlogo ${cls || ""}" src="${t.logo}" alt="">`;
+  const ini = String(t.name || "?").replace(/^the\s+/i, "").split(/\s+/).map(w => w[0] || "").join("").slice(0, 2).toUpperCase();
+  let h = 0; for (const ch of String(t.id || t.name)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return `<span class="tlogo ini ${cls || ""}" style="background:${LCOL[h % LCOL.length]}" aria-hidden="true">${esc(ini)}</span>`;
+}
+const teamOf = id => S.teams.find(t => t.id === id);
+function roundComplete(ri) { return S.teams.length > 0 && S.teams.every(t => S.scores[t.id] && S.scores[t.id][ri] !== undefined && S.scores[t.id][ri] !== ""); }
+function missingScores(through) { let n = 0; for (let ri = 0; ri <= through; ri++) if (!roundComplete(ri)) n++; return n; }
+const standLabel = th => th === SCORED - 1 ? "Final standings" : th === HALF_IDX ? "Half-time standings" : `After round ${th + 1}`;
 const ICON = {
   left:'<path d="M10 3 5 8l5 5"/>', right:'<path d="M6 3l5 5-5 5"/>',
   eye:'<path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>',
@@ -295,11 +398,12 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
    state
    ===================================================================== */
 const defaultState = () => ({
-  rev: 0, quizId: "", answerMode: "each", teams: [], scores: {}, shown: -1,
+  rev: 0, quizId: "", answerMode: "each", teams: [], scores: {}, shown: -1, prevShown: -1,
   live: { round: -1, step: 0, view: "play", timerEnd: null }
 });
 let S = defaultState();
 let role = "board";       // "host" | "board" | "player"
+let PNAME = "", PAD = { strokes: [], color: "#F2EDDC", size: 8, bg: "#1F2A5A" }, padOpen = false, logoSkip = false;
 let ANS = {}, MARKS = {}, me = null, MY = {}, ST = {}, playerTab = "sheet", joinError = "", joining = false, prevView = "play";
 let tab = "run";
 let scoreRound = 0;
@@ -597,6 +701,7 @@ async function ensureQuiz(id) {
   window.QUIZ = null; await loadScript(`quizzes/${id}/quiz.js`);
   BANK = window.QUIZ; if (!BANK) throw new Error("no quiz");
   SCORED = BANK.rounds.filter(r => r.type !== "tiebreak").length; BONUS_IDX = BANK.rounds.findIndex(r => r.type === "bonus");
+  HALF_IDX = (BANK.half || Math.ceil(BANK.rounds.filter(r => r.type !== "bonus" && r.type !== "tiebreak").length / 2)) - 1;
   BANK.rounds.forEach(r => r.questions.forEach(q => { if (q.opts && q.c !== undefined) q.a = q.opts[q.c]; }));
   if (BANK.fonts && !document.getElementById("qfonts")) { const l = document.createElement("link"); l.id = "qfonts"; l.rel = "stylesheet"; l.href = BANK.fonts; document.head.appendChild(l); }
   document.title = BANK.title;
@@ -620,12 +725,15 @@ function handleHostMsg(conn, m) {
       const nm = String(m.name).trim().slice(0, 32);
       if (nm) {
         let t = S.teams.find(x => x.name.toLowerCase() === nm.toLowerCase());
-        if (!t) { commit(s => { s.teams.push({ id: uid(), name: nm, joker: null }); }); t = S.teams[S.teams.length - 1]; }
+        if (!t) { commit(s => { s.teams.push({ id: uid(), name: nm, joker: null, logo: okLogo(m.logo) ? m.logo : null }); }); t = S.teams[S.teams.length - 1]; }
+        else if (okLogo(m.logo) && !t.logo) { const tid = t.id; commit(s => { const x = s.teams.find(y => y.id === tid); if (x) x.logo = m.logo; }); }
         id = t.id;
       }
     }
     if (id) { conn._tid = id; try { conn.send({ t: "welcome", teamId: id, answers: ANS[id] || {} }); } catch (e) {} }
     else { try { conn.send({ t: "nope" }); } catch (e) {} }
+  } else if (m.t === "logo" && conn._tid && okLogo(m.logo)) {
+    commit(s => { const x = s.teams.find(y => y.id === conn._tid); if (x) x.logo = m.logo; });
   } else if (m.t === "ans" && conn._tid) {
     const ri = +m.round, qi = +m.qi; const r = BANK.rounds[ri];
     if (!r || !(qi >= 0 && qi < r.questions.length)) return;
@@ -643,6 +751,7 @@ function suggest(r, q, text) {
   if (!text || q.closest || r.type === "picture" || r.type === "bonus" || r.type === "tiebreak") return 0;
   const t = norm(text); if (!t) return 0;
   const cands = [q.a.replace(/\s*\(.*\)\s*/g, ""), ...(q.acc || [])].map(norm).filter(Boolean);
+  if (q.connection && cands.some(c => c.length >= 4 && (" " + t + " ").includes(" " + c + " "))) return 1;
   for (const c of cands) { if (t === c) return 1; if (/[a-z]/.test(c) && c.length >= 5 && lev(t, c) <= (c.length >= 9 ? 2 : 1)) return 1; }
   return 0;
 }
@@ -700,29 +809,23 @@ function crumb() {
   const n = r.type === "tiebreak" ? "Tiebreaker" : r.type === "bonus" ? "Bonus round" : `Round ${L.round + 1} of ${BANK.rounds.filter(x => x.type !== "bonus" && x.type !== "tiebreak").length}`;
   return `${n} · ${r.title}`;
 }
-function sideStandings() {
-  if (S.shown < 0 || !S.teams.length) return "";
-  const rows = standings(S.shown);
-  return `<aside class="frame side" aria-label="Standings">
-    <h3>Standings</h3>
-    <div class="sub" style="font-size:14px;color:var(--iv3)">After ${afterWord(S.shown)}</div>
-    ${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${esc(r.name)}</span><span class="tt">${r.total}</span></div>`).join("")}
-  </aside>`;
-}
-function visHTML(q, small) {
+function visHTML(q, small, r, reveal, qi) {
   const v = q.vis; if (!v) return "";
-  const cls = "vis" + (small ? " sm" : "");
+  const cls = "vis" + (small ? " sm" : ""); const lay = r && r.layout;
+  if (v.swatch && lay === "pantone") return `<div class="${cls} pchip" role="img" aria-label="Colour swatch"><div class="pcol" style="background:${esc(v.swatch)}"></div><div class="plab"><b>PANTONE</b><span class="pcode num">${reveal && v.code ? esc(v.code) : "?? - ????"}</span><span class="pname">${reveal ? esc(q.a) : "Name this colour"}</span></div></div>`;
   if (v.swatch) return `<div class="${cls} swatch" style="background:${esc(v.swatch)}" role="img" aria-label="Colour swatch"></div>`;
-  if (v.font) return `<div class="${cls} fontbox" style="font-family:'${esc(v.font)}',serif" role="img" aria-label="Sample text in a typeface">${esc(v.sample || "Pub Quiz Night")}</div>`;
-  if (v.flag) return `<div class="${cls} flagbox"><img src="https://flagcdn.com/w640/${esc(v.flag)}.png" alt="A national flag" referrerpolicy="no-referrer"></div>`;
-  if (v.svg) return `<div class="${cls} svgbox" role="img" aria-label="Silhouette">${v.svg}</div>`;
-  if (v.img) return `<div class="${cls} flagbox"><img src="${esc(v.img)}" alt="Picture" referrerpolicy="no-referrer"></div>`;
-  return "";
+  if (v.font) return `<div class="${cls} spec" role="img" aria-label="Type specimen"><small>Specimen ${qi !== undefined ? "no. " + (qi + 1) : ""}</small><div class="specaa" style="font-family:'${esc(v.font)}',serif">Aa</div><div class="spectx" style="font-family:'${esc(v.font)}',serif">${esc(v.sample || "Pub Quiz Night")}</div><small class="specfoot" style="font-family:'${esc(v.font)}',serif">ABCDEFG abcdefg 0123</small></div>`;
+  if (v.flag) return `<div class="${cls} flagbox"><div class="flagin"><img src="https://flagcdn.com/w640/${esc(v.flag)}.png" alt="A national flag" referrerpolicy="no-referrer"></div></div>`;
+  if (v.icon) return `<div class="${cls} iconbox" aria-hidden="true">${v.icon}</div>`;
+  const inner = v.svg ? v.svg : v.img ? `<img src="${esc(v.img)}" alt="Picture" referrerpolicy="no-referrer">` : "";
+  if (lay === "gallery") return `<figure class="${cls} gal"><div class="galmat"><div class="galin">${inner}</div></div><figcaption>Exhibit ${qi !== undefined ? qi + 1 : ""}</figcaption></figure>`;
+  return `<div class="${cls} svgbox">${inner}</div>`;
 }
 const LET = ["A", "B", "C", "D", "E", "F"];
 function optsHTML(q, reveal) {
   if (!q.opts) return "";
-  return `<ol class="opts ${reveal ? "rev" : ""}">${q.opts.map((o, i) => `<li class="${reveal ? (i === q.c ? "right" : "wrong") : ""}"><b>${LET[i]}</b><span>${esc(o)}</span></li>`).join("")}</ol>`;
+  const mx = Math.max(...q.opts.map(o => o.length));
+  return `<ol class="opts ${mx > 24 ? "xl" : mx > 14 ? "l" : ""} ${reveal ? "rev" : ""}">${q.opts.map((o, i) => `<li class="${reveal ? (i === q.c ? "right" : "wrong") : ""}"><b>${LET[i]}</b><span>${esc(o)}</span></li>`).join("")}</ol>`;
 }
 function stageHTML() {
   const L = S.live; const r = BANK.rounds[L.round]; const steps = buildSteps(L.round);
@@ -730,17 +833,17 @@ function stageHTML() {
   const eb = (t, d) => `<div class="eyebrow">${esc(t)}</div>${d && deco() ? '<div class="dd" aria-hidden="true"><i></i></div>' : ""}`;
   if (s.t === "intro") {
     const num = r.type === "tiebreak" ? "Tiebreaker" : r.type === "bonus" ? "Bonus" : `Round ${L.round + 1}`;
-    return `<section class="frame stage">${decoTop()}${eb(num, 1)}<h1 class="big">${esc(r.title)}</h1><p class="rule">${esc(r.rule)}</p></section>`;
+    return `<section class="frame stage">${decoTop()}${eb(num, 1)}<h1 class="big ${r.title.length > 20 ? "long" : ""}">${esc(r.title)}</h1><p class="rule">${esc(r.rule)}</p></section>`;
   }
   if (s.t === "q") {
     const q = r.questions[s.qi]; const n = r.questions.length;
-    const label = r.type === "bonus" ? "The challenge" : r.type === "tiebreak" ? "Closest answer wins" : `Question ${s.qi + 1} of ${n}${s.phase === "answers" ? " · answers" : ""}`;
+    const label = q.connection ? "The secret connection" : r.type === "bonus" ? "The challenge" : r.type === "tiebreak" ? "Closest answer wins" : `Question ${s.qi + 1} of ${n}${s.phase === "answers" ? " · answers" : ""}`;
     const photo = r.type === "picture" && !q.vis ? `<div class="photo">Look at the host's screen</div>` : "";
     if (q.opts) {
-      return `<section class="frame stage mcq">${decoTop()}${eb(label)}<div class="mcqrow">${q.vis ? visHTML(q) : ""}<div class="mcqtxt"><p class="qtext ${q.vis ? "" : "wide"}">${esc(q.q)}</p>${optsHTML(q, s.reveal)}</div></div></section>`;
+      return `<section class="frame stage mcq ${s.reveal ? "done" : ""} lay-${r.layout || "std"}">${decoTop()}${eb(label)}<div class="mcqrow">${q.vis ? visHTML(q, false, r, s.reveal, s.qi) : ""}<div class="mcqtxt"><p class="qtext ${q.vis ? "" : "wide"}">${esc(q.q)}</p>${optsHTML(q, s.reveal)}</div></div></section>`;
     }
     const ans = s.reveal ? `<div class="ans"><small>Answer</small><b>${esc(q.a)}</b></div>` : "";
-    return `<section class="frame stage">${decoTop()}${eb(label)}<p class="qtext ${r.type === "bonus" ? "wide" : ""}">${esc(q.q)}</p>${photo}${ans}</section>`;
+    return `<section class="frame stage ${s.reveal ? "done" : ""}">${decoTop()}${eb(label)}<p class="qtext ${r.type === "bonus" ? "wide" : ""}">${esc(q.q)}</p>${photo}${ans}</section>`;
   }
   if (s.t === "timer") {
     return `<section class="frame stage">${decoTop()}${eb("Bonus round", 1)}<div class="clock num" id="clock" data-secs="${s.secs}">${fmt(s.secs)}</div><p class="rule">${esc(r.rule)}</p></section>`;
@@ -761,9 +864,9 @@ setInterval(tickClock, 250);
 
 function standingsScene() {
   const through = S.shown;
-  if (through < 0 || !S.teams.length) return `<section class="frame empty">${S.teams.length ? "No scores yet. Round one is next." : "Teams will appear here."}</section>`;
+  if (through < 0 || !S.teams.length) return `<section class="frame empty">${S.teams.length ? "Scores are revealed at half-time and at the end." : "Teams will appear here."}</section>`;
   const rows = standings(through);
-  const prev = through >= 1 ? standings(through - 1) : null;
+  const prev = S.prevShown >= 0 && S.prevShown < through ? standings(S.prevShown) : null;
   const prevIdx = {}; if (prev) prev.forEach((r, i) => prevIdx[r.id] = { i, rank: r.rank });
   const n = through + 1;
   const heads = Array.from({ length: n }, (_, i) => `<div class="c rd ${i === through ? "last" : ""}">${BANK.rounds[i].type === "bonus" ? "B" : "R" + (i + 1)}</div>`).join("");
@@ -772,10 +875,10 @@ function standingsScene() {
     const mvh = mv > 0 ? `<span class="mv">${ic("up")}${mv}</span>` : mv < 0 ? `<span class="mv dn">${ic("down")}${-mv}</span>` : "";
     const cells = r.per.map((p, k) => `<div class="c rd num ${k === through ? "last" : ""}">${p === null ? "·" : p}${S.teams.find(t => t.id === r.id).joker === k ? '<span class="jk">×2</span>' : ""}</div>`).join("");
     const pi = prevIdx[r.id] ? prevIdx[r.id].i : -1;
-    return `<div class="trow num ${r.rank === 1 ? "top" : ""}" data-id="${r.id}" data-new="${i}" data-prev="${pi}"><div class="rk">${r.rank}${r.tie ? "=" : ""}${mvh}</div><div class="tn">${esc(r.name)}</div>${cells}<div class="tot">${r.total}</div></div>`;
+    return `<div class="trow num ${r.rank === 1 ? "top" : ""}" data-id="${r.id}" data-new="${i}" data-prev="${pi}"><div class="rk">${r.rank}${r.tie ? "=" : ""}${mvh}</div><div class="tn">${logoHTML(teamOf(r.id))}<span>${esc(r.name)}</span></div>${cells}<div class="tot">${r.total}</div></div>`;
   }).join("");
-  const lbl = through === SCORED - 1 ? "Final standings" : `After round ${through + 1}`;
-  return `<section class="frame stand">${deco() ? `<div class="crown" aria-hidden="true">${CROWN}</div>` : ""}<h2>${esc(lbl)}</h2><p class="sub2">${esc(BANK.rounds[through].title)}</p>
+  const lbl = standLabel(through);
+  return `<section class="frame stand">${deco() ? `<div class="crown" aria-hidden="true">${CROWN}</div>` : ""}<h2>${esc(lbl)}</h2><p class="sub2">${esc(through === HALF_IDX ? `After round ${through + 1}` : through === SCORED - 1 ? `After ${afterWord(through)}` : BANK.rounds[through].title)}</p>
     <div style="--n:${n}"><div class="trow thead"><div>Rank</div><div>Team</div>${heads}<div style="text-align:right;padding-right:6px">Total</div></div><div id="rows" style="--n:${n}">${body}</div></div></section>`;
 }
 function animateRows() {
@@ -794,9 +897,9 @@ function renderBoard() {
   if (scene === "scores") body = `<div class="bbody">${standingsScene()}</div>`;
   else if (scene === "join") body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="eyebrow">Join the quiz</div><h1 class="big">Scan to join</h1>${joinPanel()}</section></div>`;
   else if (scene === "lobby") {
-    body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="eyebrow">Tonight</div><h1 class="big">${esc(BANK.title)}</h1><p class="sub">${S.teams.length ? S.teams.map(t => esc(t.name)).join(" · ") : "Teams are being added."}</p><p class="rule">${esc(BANK.intro || "")}</p>${joinPanel()}</section></div>`;
+    body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="lobby"><div class="lobl"><div class="eyebrow">Tonight</div><h1 class="big ${BANK.title.length > 16 ? "long" : ""}">${esc(BANK.title)}</h1><p class="rule">${esc(BANK.intro || "")}</p>${S.teams.length ? `<div class="lobbyteams">${S.teams.map(t => `<div class="lt">${logoHTML(t, "lg")}<span>${esc(t.name)}</span></div>`).join("")}</div>` : `<p class="sub">Teams appear here as they join.</p>`}</div><div class="lobr">${joinPanel()}</div></div></section></div>`;
   } else {
-    const side = sideStandings();
+    const side = "";
     body = `<div class="bbody ${side ? "split" : ""}">${stageHTML()}${side}</div>`;
   }
   setApp(`<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`);
@@ -846,6 +949,8 @@ function actions() {
       if (idx >= 0) commit(s => { s.live.step = idx; });
     },
     toggleJoin() { commit(s => { s.live.view = s.live.view === "join" ? "play" : "join"; }); },
+    revealHalf() { commit(s => { s.prevShown = -1; s.shown = HALF_IDX; s.live.view = "scores"; }); },
+    revealFinal() { commit(s => { s.prevShown = s.shown >= 0 && s.shown < SCORED - 1 ? s.shown : -1; s.shown = SCORED - 1; s.live.view = "scores"; }); },
     toggleScores() { commit(s => { s.live.view = s.live.view === "scores" ? "play" : "scores"; }); },
     timer(on) { commit(s => { s.live.timerEnd = on ? Date.now() + (curStep().s.secs || 150) * 1000 : null; }); }
   };
@@ -882,43 +987,53 @@ function runTab() {
         </div>
         <div class="kbd"><b>←</b> <b>→</b> step · <b>Space</b> reveal · <b>S</b> scores on the board</div>
       </div>
-      <div class="panel"><h3>On the board</h3>
-        <div class="ctrls"><button class="btn ${L.view === "scores" ? "pri" : ""}" data-act="toggleScores">${ic("list")}${L.view === "scores" ? "Back to the quiz" : "Show standings"}</button><button class="btn ${L.view === "join" ? "pri" : ""}" data-act="toggleJoin">${ic("board")}${L.view === "join" ? "Back to the quiz" : "Show join code"}</button></div>
-        <p class="note" style="margin-top:12px">Published through ${S.shown < 0 ? "no rounds yet" : "round " + (S.shown + 1)}.</p>
+      <div class="panel">${revealBlock()}
+        <div class="ctrls" style="margin-top:14px"><button class="btn ${L.view === "join" ? "pri" : ""}" data-act="toggleJoin">${ic("board")}${L.view === "join" ? "Back to the quiz" : "Show join code"}</button></div>
         <h3 style="margin-top:18px">Jump to a step</h3>
         <ul class="steplist">${c.steps.map((x, k) => `<li><button class="${k === c.i ? "cur" : k < c.i ? "done" : ""}" data-go="${k}" aria-label="${esc(stepLabel(r, x))}">${stepShort(r, x, k)}</button></li>`).join("")}</ul>
       </div></div>`;
   }
   return top;
 }
+function revealBlock() {
+  const L = S.live; const halfDone = S.shown >= HALF_IDX; const finalDone = S.shown >= SCORED - 1;
+  const sugHalf = !halfDone && L.round >= HALF_IDX; const sugFinal = halfDone && !finalDone && L.round >= SCORED - 1;
+  const mh = missingScores(HALF_IDX), mf = missingScores(SCORED - 1);
+  const need = n => n ? ` · ${n} round${n > 1 ? "s" : ""} still need scores` : "";
+  return `<h3>Scoreboard</h3><p class="note">Scores stay hidden on the TV and on phones until you reveal them.</p>
+    <div class="ctrls" style="margin-top:12px">
+      <button class="btn ${sugHalf ? "pri" : ""}" data-act="revealHalf">${ic("list")}Reveal half-time scores</button>
+      <button class="btn ${sugFinal ? "pri" : ""}" data-act="revealFinal">${ic("list")}Reveal final scores</button>
+      ${L.view === "scores" ? `<button class="btn" data-act="toggleScores">Back to the quiz</button>` : ""}
+    </div>
+    <p class="note" style="margin-top:10px">Half-time: after round ${HALF_IDX + 1}${halfDone ? " · revealed" : need(mh)}.<br>Final: after ${afterWord(SCORED - 1)}${finalDone ? " · revealed" : halfDone ? need(mf) : ""}.</p>`;
+}
 function scoreTab() {
   const ri0 = Math.min(scoreRound, SCORED - 1);
-  return `<div style="display:flex;flex-direction:column;gap:20px">${scoreTabMain()}${reviewHTML(ri0)}</div>`;
+  return `<div style="display:flex;flex-direction:column;gap:20px">${scoreTabMain()}${reviewHTML(ri0)}<div class="panel">${revealBlock()}</div></div>`;
 }
 function scoreTabMain() {
   const ri = Math.min(scoreRound, SCORED - 1); const r = BANK.rounds[ri];
   const min = r.min ?? 0, max = r.max;
-  const chips = BANK.rounds.slice(0, SCORED).map((x, i) => `<button class="btn sm ${i === ri ? "pri" : ""}" data-sr="${i}" aria-label="${esc(x.title)}">${x.type === "bonus" ? "Bonus" : "R" + (i + 1)}${S.shown >= i ? " ✓" : ""}</button>`).join("");
+  const chips = BANK.rounds.slice(0, SCORED).map((x, i) => `<button class="btn sm ${i === ri ? "pri" : ""}" data-sr="${i}" aria-label="${esc(x.title)}">${x.type === "bonus" ? "Bonus" : "R" + (i + 1)}${roundComplete(i) ? " ✓" : ""}</button>`).join("");
   if (!S.teams.length) return `<div class="panel"><p class="note">Add teams first.</p><button class="btn" data-tab="teams" style="margin-top:10px">Add teams</button></div>`;
   const rows = S.teams.map(t => {
     const v = S.scores[t.id] && S.scores[t.id][ri]; const jk = t.joker === ri;
     const pts = roundPts(t, ri);
-    return `<tr><td>${esc(t.name)}</td>
+    return `<tr><td><span class="tcell">${logoHTML(t)}${esc(t.name)}</span></td>
       <td><div class="step"><button data-fk="d-${t.id}" data-dec="${t.id}" aria-label="Minus one for ${esc(t.name)}">${ic("minus")}</button><input class="num" inputmode="numeric" data-fk="s-${t.id}" data-score="${t.id}" value="${v === undefined ? "" : v}" aria-label="Points for ${esc(t.name)}"><button data-fk="i-${t.id}" data-inc="${t.id}" aria-label="Plus one for ${esc(t.name)}">${ic("plus")}</button></div></td>
       <td>${r.type === "bonus" ? "" : `<button data-fk="j-${t.id}" class="btn sm ${jk ? "pri" : ""}" data-joker="${t.id}" aria-pressed="${jk}">${jk ? "Joker played" : "Play joker"}</button>`}</td>
       <td class="num">${pts === null ? "·" : pts}${jk && pts !== null ? ' <span class="pill">×2</span>' : ""}</td></tr>`;
   }).join("");
-  const published = S.shown >= ri;
-  return `<div class="panel"><div class="row" style="margin-bottom:14px">${chips}</div>
+    return `<div class="panel"><div class="row" style="margin-bottom:14px">${chips}</div>
     <h3>${esc(r.title)}</h3><p class="note">${esc(r.rule)} Points available: ${r.type === "bonus" ? `${min} to ${max}` : max}.</p>
     <div style="overflow-x:auto;margin-top:10px"><table class="sc"><thead><tr><th>Team</th><th>Points</th><th>Joker</th><th>Counts as</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="row" style="margin-top:16px">
-      ${published && S.shown === ri ? `<button class="btn" data-unpub="${ri}">Hide from board</button>` : ""}
-      <button class="btn pri" data-pub="${ri}">${published ? "Show standings again" : `Publish round ${ri + 1} to the board`}</button>
+      <span class="note">Scores save as you type. Nobody sees them until you reveal the scoreboard.</span>
       <span class="toast">${esc(toast)}</span></div></div>`;
 }
 function teamsTab() {
-  const rows = S.teams.map(t => `<li><input class="inp" data-fk="t-${t.id}" data-rename="${t.id}" value="${esc(t.name)}" aria-label="Team name"><span class="chip" style="white-space:nowrap">${t.joker === null || t.joker === undefined ? "Joker unused" : "Joker: round " + (t.joker + 1)}</span><button class="btn ico sm danger" data-del="${t.id}" aria-label="Remove ${esc(t.name)}">${ic("x")}</button></li>`).join("");
+  const rows = S.teams.map(t => `<li>${logoHTML(t)}<input class="inp" data-fk="t-${t.id}" data-rename="${t.id}" value="${esc(t.name)}" aria-label="Team name"><span class="chip" style="white-space:nowrap">${t.joker === null || t.joker === undefined ? "Joker unused" : "Joker: round " + (t.joker + 1)}</span><button class="btn ico sm danger" data-del="${t.id}" aria-label="Remove ${esc(t.name)}">${ic("x")}</button></li>`).join("");
   return `<div class="panel"><h3>Teams</h3>
     <div class="row"><div class="sp" style="min-width:200px"><label class="lbl" for="newteam">Team name</label><input class="inp" id="newteam" data-fk="newteam" maxlength="32" placeholder="The Porkopolitans"></div><button class="btn pri" data-addteam style="align-self:end">${ic("plus")}Add team</button></div>
     ${S.teams.length ? `<ul class="list" style="margin-top:14px">${rows}</ul>` : '<p class="note" style="margin-top:14px">No teams yet.</p>'}</div>`;
@@ -948,8 +1063,8 @@ function settingsTab() {
 function hostHTML() {
   const L = S.live;
   const rail = BANK.rounds.map((r, i) => {
-    const done = S.shown >= i; const cur = L.round === i;
-    return `<button class="ritem ${cur ? "cur" : ""}" data-start="${i}" aria-label="Go to ${esc(r.title)}"><span class="n num">${r.type === "tiebreak" ? "T" : r.type === "bonus" ? "B" : i + 1}</span><span class="t">${esc(r.title)}</span><span class="dot ${done ? "ok" : ""}" title="${done ? "Published" : "Not published"}"></span></button>`;
+    const done = roundComplete(i); const cur = L.round === i;
+    return `<button class="ritem ${cur ? "cur" : ""}" data-start="${i}" aria-label="Go to ${esc(r.title)}"><span class="n num">${r.type === "tiebreak" ? "T" : r.type === "bonus" ? "B" : i + 1}</span><span class="t">${esc(r.title)}</span><span class="dot ${done ? "ok" : ""}" title="${done ? "Scored" : "Not scored yet"}"></span></button>`;
   }).join("");
   const tabs = [["run", "Run"], ["score", "Score"], ["teams", "Teams"], ["settings", "Settings"]];
   const content = tab === "run" ? runTab() : tab === "score" ? scoreTab() : tab === "teams" ? teamsTab() : settingsTab();
@@ -970,7 +1085,7 @@ document.addEventListener("click", e => {
   if (role !== "host") return;
   const t = e.target.closest("button"); if (!t) return;
   const d = t.dataset;
-  if (d.act) { if (d.act === "next") A.next(); else if (d.act === "back") A.back(); else if (d.act === "reveal") A.reveal(); else if (d.act === "toggleScores") A.toggleScores(); else if (d.act === "toggleJoin") A.toggleJoin(); else if (d.act === "usemarks") useMarks(+d.ri); else if (d.act === "timer1") A.timer(true); else if (d.act === "timer0") A.timer(false); else if (d.act === "newroom") { code = newCode(); saveHost(); Net.host(code); render(); } return; }
+  if (d.act) { if (d.act === "next") A.next(); else if (d.act === "back") A.back(); else if (d.act === "reveal") A.reveal(); else if (d.act === "toggleScores") A.toggleScores(); else if (d.act === "revealHalf") A.revealHalf(); else if (d.act === "revealFinal") A.revealFinal(); else if (d.act === "toggleJoin") A.toggleJoin(); else if (d.act === "usemarks") useMarks(+d.ri); else if (d.act === "timer1") A.timer(true); else if (d.act === "timer0") A.timer(false); else if (d.act === "newroom") { code = newCode(); saveHost(); Net.host(code); render(); } return; }
   if (d.tab) { tab = d.tab; if (d.sr !== undefined) scoreRound = +d.sr; return render(); }
   if (d.start !== undefined) { A.start(+d.start); return; }
   if (d.go !== undefined) return A.go(+d.go);
@@ -1042,47 +1157,97 @@ function visibleQs(ri) {
   BANK.rounds[ri].questions.forEach((q, qi) => { const first = steps.findIndex(s => s.t === "q" && s.qi === qi); if (first >= 0 && first <= cur) out.push(qi); });
   return out;
 }
+const FUN_NAMES = ["Quiz Khalifa", "Agatha Quiztie", "Les Quizerables", "The Quizzly Bears", "Universally Challenged", "Tequila Mockingbird", "Smarty Pints", "Quizzy Rascal", "Trivia Newton-John", "The Know-It-Ales", "Risky Quizness", "Beer Pressure", "Let's Get Quizzical", "The Fact Hunt", "E=MC Hammered", "Quizteama Aguilera", "Ctrl Alt Defeat", "The Brew Crew", "Pun Intended", "Gin and Bear It", "Sherlock Foams", "Bohemian Quizody"];
+const PAD_COLORS = ["#F2EDDC", "#0A0A1E", "#D4AF37", "#E63946", "#2A9D8F", "#4361EE", "#F4A261", "#C77DFF"];
+const PAD_BGS = ["#1F2A5A", "#F2EDDC", "#E63946", "#2A9D8F", "#D4AF37", "#0A0A1E"];
+function padHTML() {
+  return `<div class="pad"><canvas id="pad" width="480" height="480" aria-label="Drawing pad for your team logo"></canvas>
+    <div class="padtools">
+      <div class="sw" role="group" aria-label="Pen colour">${PAD_COLORS.map(c => `<button class="pdot ${PAD.color === c ? "on" : ""}" data-pc="${c}" style="background:${c}" aria-label="Pen colour ${c}" aria-pressed="${PAD.color === c}"></button>`).join("")}</div>
+      <div class="row"><button class="btn sm ${PAD.size === 8 ? "pri" : ""}" data-ps="8">Thin</button><button class="btn sm ${PAD.size === 22 ? "pri" : ""}" data-ps="22">Thick</button><button class="btn sm" data-pundo ${PAD.strokes.length ? "" : "disabled"}>Undo</button><button class="btn sm" data-pclear ${PAD.strokes.length ? "" : "disabled"}>Clear</button></div>
+      <div class="sw" role="group" aria-label="Background colour"><small>Background</small>${PAD_BGS.map(c => `<button class="pdot sq ${PAD.bg === c ? "on" : ""}" data-pb="${c}" style="background:${c}" aria-label="Background ${c}" aria-pressed="${PAD.bg === c}"></button>`).join("")}</div>
+    </div></div>`;
+}
+function padPaint(ctx, W) {
+  ctx.fillStyle = PAD.bg; ctx.fillRect(0, 0, W, W); ctx.lineCap = "round"; ctx.lineJoin = "round";
+  for (const s of PAD.strokes) {
+    ctx.strokeStyle = ctx.fillStyle = s.c; ctx.lineWidth = s.s * W / 480;
+    if (s.p.length === 1) { ctx.beginPath(); ctx.arc(s.p[0][0] * W, s.p[0][1] * W, ctx.lineWidth / 2, 0, 7); ctx.fill(); continue; }
+    ctx.beginPath(); s.p.forEach(([x, y], i) => i ? ctx.lineTo(x * W, y * W) : ctx.moveTo(x * W, y * W)); ctx.stroke();
+  }
+}
+function padBind() {
+  const cv = $("#pad"); if (!cv) return; padPaint(cv.getContext("2d"), cv.width);
+  if (cv._b) return; cv._b = 1; let cur = null;
+  const pt = e => { const r = cv.getBoundingClientRect(); return [Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))]; };
+  cv.addEventListener("pointerdown", e => { e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch (x) {} cur = { c: PAD.color, s: PAD.size, p: [pt(e)] }; PAD.strokes.push(cur); padPaint(cv.getContext("2d"), cv.width); });
+  cv.addEventListener("pointermove", e => { if (!cur) return; e.preventDefault(); cur.p.push(pt(e)); padPaint(cv.getContext("2d"), cv.width); });
+  const end = () => { if (cur) { cur = null; render(); } };
+  cv.addEventListener("pointerup", end); cv.addEventListener("pointercancel", end);
+}
+function padExport() {
+  if (!PAD.strokes.length) return null;
+  const c = document.createElement("canvas"); c.width = c.height = 112; padPaint(c.getContext("2d"), 112);
+  const u = c.toDataURL("image/png"); return okLogo(u) ? u : null;
+}
+function qlineHTML(r, ri, qi, past) {
+  const q = r.questions[qi]; const open = answerOpen(ri, qi); const v = (MY[ri] && MY[ri][qi]) || "";
+  const label = q.connection ? "The secret connection" : r.type === "picture" && !q.opts ? "Picture " + (qi + 1) : r.type === "bonus" ? "Stations, in order" : "Question " + (qi + 1);
+  const txt = r.type === "picture" && !q.opts ? "" : `<p class="qt">${esc(q.q)}</p>`;
+  const head = `<p class="qn">${label}${open ? "" : " · closed"}</p>`;
+  const st = `<div class="st" data-st="${ri}-${qi}" role="status"></div>`;
+  if (q.opts) {
+    if (past) {
+      const ix = LET.indexOf(v);
+      const mini = q.opts.map((o, i) => `<button class="choice mini" data-fk="c-${ri}-${qi}-${i}" data-pick="${ri}|${qi}|${LET[i]}" aria-pressed="${v === LET[i]}" aria-label="${LET[i]}: ${esc(o)}" ${open ? "" : "disabled"}><b>${LET[i]}</b></button>`).join("");
+      return `<div class="qline past ${open ? "" : "locked"}">${head}${txt}<div class="minirow">${mini}<span class="picked">${ix >= 0 ? esc(q.opts[ix]) : "No answer"}</span></div>${st}</div>`;
+    }
+    const ch = q.opts.map((o, i) => `<button class="choice" data-fk="c-${ri}-${qi}-${i}" data-pick="${ri}|${qi}|${LET[i]}" aria-pressed="${v === LET[i]}" ${open ? "" : "disabled"}><b>${LET[i]}</b><span>${esc(o)}</span></button>`).join("");
+    return `<div class="qline ${open ? "" : "locked"}">${head}${visHTML(q, true, r, false, qi)}${txt}<div class="choices">${ch}</div>${st}</div>`;
+  }
+  const field = r.type === "bonus" ? `<textarea data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" placeholder="One station per line">${esc(v)}</textarea>` : `<input data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" autocomplete="off" autocapitalize="sentences" value="${esc(v)}" placeholder="${q.connection ? "What links the answers?" : ""}">`;
+  return `<div class="qline ${past ? "past" : ""} ${q.connection ? "conn" : ""} ${open ? "" : "locked"}">${head}${txt}${field}${st}</div>`;
+}
 function playerHTML() {
   const head = `<div class="phead"><div class="mark">${esc(BANK.title)}</div><div class="tm">Room ${esc(code)}</div></div>`;
+  const err = joinError ? `<p class="note" role="alert" style="color:#e58f8f;margin-top:10px">${esc(joinError)}</p>` : "";
   if (!me) {
-    const list = S.teams.map(t => `<button class="btn" data-pj="${t.id}">${esc(t.name)}</button>`).join("");
-    return `<div class="player">${head}<section class="frame" style="padding:20px"><h2 style="margin:0 0 6px;font-weight:500;font-size:24px">Which team are you?</h2><p class="note">Pick your team, or type a new name. One phone per team.</p>
-      ${list ? `<div class="teampick">${list}</div>` : ""}
-      <label class="lbl" for="pname">Team name</label><input class="inp" id="pname" data-fk="pname" maxlength="32" autocomplete="off" placeholder="The Porkopolitans">
-      <div class="row" style="margin-top:12px"><button class="btn pri" data-pjn>${joining ? "Joining" : "Join"}</button></div>
-      ${joinError ? `<p class="note" role="alert" style="color:#e58f8f;margin-top:10px">${esc(joinError)}</p>` : ""}</section></div>`;
+    const list = S.teams.map(t => `<button class="btn tpick" data-pj="${t.id}">${logoHTML(t)}<span>${esc(t.name)}</span></button>`).join("");
+    return `<div class="player">${head}<section class="frame" style="padding:20px"><h2 class="ph2">Start your team</h2><p class="note">Pick a fun name and draw your team logo together. One phone per team.</p>
+      <label class="lbl" for="pname" style="margin-top:12px">Team name</label>
+      <div class="row"><input class="inp sp" id="pname" data-fk="pname" maxlength="32" autocomplete="off" placeholder="Quiz Khalifa" value="${esc(PNAME)}"><button class="btn" data-psug>${ic("plus")}Suggest one</button></div>
+      <label class="lbl" style="margin-top:16px">Team logo <span style="color:var(--iv3)">(draw with your finger)</span></label>${padHTML()}
+      <div class="row" style="margin-top:16px"><button class="btn pri" data-pjn>${joining ? "Joining" : "Join the quiz"}</button></div>${err}</section>
+      ${list ? `<section class="frame" style="padding:20px"><h2 class="ph2">Already joined?</h2><p class="note">Rejoin your team on this phone.</p><div class="teampick">${list}</div></section>` : ""}</div>`;
   }
-  const team = S.teams.find(t => t.id === me.teamId);
+  const team = teamOf(me.teamId);
+  const top = `<div class="phead"><div class="pteam">${logoHTML(team)}<span>${esc(team ? team.name : "")}</span></div><div class="row"><button class="btn sm" data-plogo>${team && team.logo ? "Edit logo" : "Draw logo"}</button><button class="btn sm" data-pleave>Change team</button></div></div>`;
+  if (padOpen || (team && !team.logo && !logoSkip && S.live.round < 0)) {
+    return `<div class="player">${head}${top}<section class="frame" style="padding:20px"><h2 class="ph2">Draw your team logo</h2><p class="note">It appears next to your name on the scoreboard.</p>${padHTML()}
+      <div class="row" style="margin-top:16px"><button class="btn pri" data-psave>Save logo</button><button class="btn" data-pskip>${padOpen ? "Cancel" : "Skip for now"}</button></div>${err}</section></div>`;
+  }
   const tabs = `<div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="${playerTab === "sheet"}" data-ptab="sheet">Answers</button><button class="tab" role="tab" aria-selected="${playerTab === "scores"}" data-ptab="scores">Scores</button></div>`;
   let body = "";
   const L = S.live;
   if (playerTab === "scores") {
-    if (S.shown < 0) body = `<p class="note">No scores yet.</p>`;
-    else { const rows = standings(S.shown); body = `<section class="frame psc" style="padding:16px"><div class="sub" style="font-size:14px;color:var(--iv3);margin-bottom:6px">After ${afterWord(S.shown)}</div>${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""} ${r.id === me.teamId ? "me" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${esc(r.name)}</span><span class="tt">${r.total}</span></div>`).join("")}</section>`; }
+    if (S.shown < 0) body = `<p class="note">Scores are revealed at half-time and at the end.</p>`;
+    else { const rows = standings(S.shown); body = `<section class="frame psc" style="padding:16px"><div class="sub" style="font-size:14px;color:var(--iv3);margin-bottom:6px">${esc(standLabel(S.shown))}</div>${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""} ${r.id === me.teamId ? "me" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${logoHTML(teamOf(r.id))}<span>${esc(r.name)}</span></span><span class="tt">${r.total}</span></div>`).join("")}</section>`; }
   } else if (L.round < 0) body = `<p class="note">The quiz has not started. Your answer sheet will appear here.</p>`;
   else {
     const ri = L.round; const r = BANK.rounds[ri]; const qs = visibleQs(ri);
+    const cur = qs[qs.length - 1]; const past = qs.slice(0, -1).reverse();
     body = `<section class="frame" style="padding:8px 18px"><div class="eyebrow" style="padding-top:12px">${esc(r.type === "bonus" ? "Bonus round" : "Round " + (ri + 1))}</div><div style="font-size:20px;margin:2px 0 8px">${esc(r.title)}</div>` +
-      (qs.length ? qs.map(qi => {
-        const q = r.questions[qi]; const open = answerOpen(ri, qi); const v = (MY[ri] && MY[ri][qi]) || "";
-        const label = r.type === "picture" ? "Picture " + (qi + 1) : r.type === "bonus" ? "Stations, in order" : "Question " + (qi + 1);
-        const txt = r.type === "picture" && !q.opts ? "" : `<p class="qt">${esc(q.q)}</p>`;
-        if (q.opts) {
-          const pick = v;
-          const ch = q.opts.map((o, i) => `<button class="choice" data-fk="c-${ri}-${qi}-${i}" data-pick="${ri}|${qi}|${LET[i]}" aria-pressed="${pick === LET[i]}" ${open ? "" : "disabled"}><b>${LET[i]}</b><span>${esc(o)}</span></button>`).join("");
-          return `<div class="qline ${open ? "" : "locked"}"><p class="qn">${label}${open ? "" : " · closed"}</p>${visHTML(q, true)}${txt}<div class="choices">${ch}</div><div class="st" data-st="${ri}-${qi}" role="status"></div></div>`;
-        }
-        const field = r.type === "bonus" ? `<textarea data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" placeholder="One station per line">${esc(v)}</textarea>` : `<input data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" autocomplete="off" autocapitalize="sentences" value="${esc(v)}">`;
-        return `<div class="qline ${open ? "" : "locked"}"><p class="qn">${label}${open ? "" : " · closed"}</p>${txt}${field}<div class="st" data-st="${ri}-${qi}" role="status"></div></div>`;
-      }).join("") : `<p class="note" style="padding:8px 0 14px">Waiting for the first question.</p>`) + `</section>`;
+      (qs.length ? qlineHTML(r, ri, cur, false) + (past.length ? `<div class="earlier"><p class="eh">Earlier this round</p>${past.map(qi => qlineHTML(r, ri, qi, true)).join("")}</div>` : "")
+        : `<p class="note" style="padding:8px 0 14px">Waiting for the first question.</p>`) + `</section>`;
   }
-  return `<div class="player">${head}<div class="phead"><div style="font-size:18px">${esc(team ? team.name : "")}</div><button class="btn sm" data-pleave>Change team</button></div>${tabs}${body}</div>`;
+  return `<div class="player">${head}${top}${tabs}${body}</div>`;
 }
 function renderPlayer() {
   const ae = document.activeElement; const fk = ae && ae.dataset && ae.dataset.fk; const pos = ae && ae.selectionStart; const val = ae && ae.tagName.match(/INPUT|TEXTAREA/) ? ae.value : null;
-  if (!setApp(playerHTML())) return;
+  if (!setApp(playerHTML())) return padBind();
   if (fk) { const el = $(`[data-fk="${fk}"]`); if (el && !el.disabled) { if (val !== null) el.value = val; el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
   $$("[data-st]").forEach(el => { const [a, b] = el.dataset.st.split("-"); setStatus(a, b); });
+  padBind();
 }
 function sendAnswerNow(ri, qi, text) {
   MY[ri] = MY[ri] || {}; MY[ri][qi] = text; ST[ri + "-" + qi] = "sending";
@@ -1097,13 +1262,22 @@ function sendAnswer(ri, qi, text) {
   try { localStorage.setItem("pq:my:" + code, JSON.stringify(MY)); } catch (e) {}
 }
 document.addEventListener("keydown", e => { if (role === "player" && e.key === "Enter" && e.target.id === "pname") { const b = $("[data-pjn]"); if (b) b.click(); } });
-document.addEventListener("input", e => { if (role !== "player") return; const el = e.target; if (el.dataset.pa) { const [ri, qi] = el.dataset.pa.split("|"); sendAnswer(+ri, +qi, el.value); } });
+document.addEventListener("input", e => { if (role !== "player") return; const el = e.target; if (el.id === "pname") { PNAME = el.value; return; } if (el.dataset.pa) { const [ri, qi] = el.dataset.pa.split("|"); sendAnswer(+ri, +qi, el.value); } });
 document.addEventListener("click", e => {
   if (role !== "player") return; const t = e.target.closest("button"); if (!t) return; const d = t.dataset;
   if (d.ptab) { playerTab = d.ptab; return render(); }
   if (d.pick) { const [ri, qi, L] = d.pick.split("|"); if (t.disabled) return; sendAnswerNow(+ri, +qi, L); return render(); }
+  if (d.pc) { PAD.color = d.pc; return render(); }
+  if (d.pb) { PAD.bg = d.pb; return render(); }
+  if (d.ps) { PAD.size = +d.ps; return render(); }
+  if (d.pundo !== undefined) { PAD.strokes.pop(); return render(); }
+  if (d.pclear !== undefined) { PAD.strokes = []; return render(); }
+  if (d.psug !== undefined) { let n; do { n = FUN_NAMES[Math.floor(Math.random() * FUN_NAMES.length)]; } while (n === PNAME && FUN_NAMES.length > 1); PNAME = n; const el = $("#pname"); if (el) el.value = n; return render(); }
+  if (d.plogo !== undefined) { padOpen = true; PAD.strokes = []; joinError = ""; return render(); }
+  if (d.pskip !== undefined) { padOpen = false; logoSkip = true; return render(); }
+  if (d.psave !== undefined) { const logo = padExport(); if (!logo) { joinError = "Draw something first."; return render(); } if (!Net.send({ t: "logo", logo })) { joinError = "Not connected. Try again in a moment."; return render(); } padOpen = false; logoSkip = true; joinError = ""; PAD.strokes = []; return render(); }
   if (d.pj) { const tm = S.teams.find(x => x.id === d.pj); joining = true; joinError = ""; Net.send({ t: "hello", teamId: d.pj, name: tm && tm.name }); return render(); }
-  if (d.pjn !== undefined) { const v = ($("#pname") || {}).value || ""; if (!v.trim()) { joinError = "Enter a team name."; return render(); } joining = true; joinError = ""; if (!Net.send({ t: "hello", name: v })) { joining = false; joinError = "Not connected yet. Try again in a moment."; } return render(); }
+  if (d.pjn !== undefined) { const v = PNAME || ($("#pname") || {}).value || ""; if (!v.trim()) { joinError = "Give your team a name, or tap Suggest one."; return render(); } joining = true; joinError = ""; if (!Net.send({ t: "hello", name: v, logo: padExport() })) { joining = false; joinError = "Not connected yet. Try again in a moment."; } else { logoSkip = true; } return render(); }
   if (d.pleave !== undefined) { me = null; MY = {}; try { localStorage.removeItem("pq:me:" + code); localStorage.removeItem("pq:my:" + code); } catch (e) {} return render(); }
 });
 

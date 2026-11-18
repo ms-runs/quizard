@@ -342,6 +342,38 @@ img.tlogo{font-size:1em;width:1.7em;height:1.7em}
 .lobl{display:flex;flex-direction:column;gap:clamp(14px,2vw,26px);min-width:0}
 .lobr .joinrow{flex-direction:column;align-items:flex-start;gap:18px}
 @media (max-width:900px){.lobby{grid-template-columns:1fr}}
+
+/* how it works */
+.how{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:clamp(8px,1vw,14px)}
+.how li{display:flex;gap:14px;align-items:flex-start}
+.how .hn{flex:none;width:1.9em;height:1.9em;border:1px solid var(--gold);color:var(--gold);display:grid;place-items:center;border-radius:50%;font-size:clamp(12px,1vw,15px)}
+.how b{display:block;font-weight:500;font-size:clamp(15px,1.3vw,20px)}
+.how li span:not(.hn){display:block;color:var(--iv3);font-size:clamp(13px,1.05vw,16px);line-height:1.35}
+.howwrap{border-top:1px solid var(--line2);padding-top:clamp(10px,1.4vw,18px)}
+.lobr{display:flex;flex-direction:column;gap:clamp(16px,2vw,28px)}
+.rulesc .how b{font-size:clamp(20px,2.2vw,34px)}
+.rulesc .how li span:not(.hn){font-size:clamp(16px,1.6vw,24px)}
+.rulesc .how .hn{font-size:clamp(16px,1.5vw,22px)}
+/* host phases */
+.phase{border:1px solid var(--line2);padding:12px;margin-top:10px}
+.phase.on{border-color:var(--gold);background:rgba(212,175,55,.06)}
+.phase .pt{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.warn{color:#e5b45f;font-size:13px}.okk{color:#7fc79a;font-size:13px}
+/* phone review summary */
+.rvr{margin-top:14px}
+.rvq{border-top:1px solid var(--line2);padding:10px 0;opacity:.75}
+.rvq.open{opacity:1}
+.rvq.now{opacity:1;border:1px solid var(--gold);padding:10px;background:rgba(212,175,55,.07)}
+.rvh{display:flex;justify-content:space-between;align-items:center}
+.rvq .qt{font-size:15px;margin:2px 0 6px}
+.rva{display:flex;flex-direction:column;gap:2px;font-size:14px;color:var(--iv2)}
+.rva b{font-weight:500;color:var(--ivory)}
+.rvc b{color:var(--gold)}
+.rvc.wait{color:var(--iv3);font-style:italic}
+.tick,.cross{font-size:18px;font-weight:600}.tick{color:#7fc79a}.cross{color:#e58f8f}
+.how.compact li span:not(.hn){display:none}
+.how.compact li{align-items:center}
+.how.compact{gap:clamp(6px,.8vw,10px)}
 </style>
 </head>
 <body>
@@ -398,12 +430,12 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
    state
    ===================================================================== */
 const defaultState = () => ({
-  rev: 0, quizId: "", answerMode: "each", teams: [], scores: {}, shown: -1, prevShown: -1,
-  live: { round: -1, step: 0, view: "play", timerEnd: null }
+  rev: 0, quizId: "", answerMode: "each", revealMode: "review", teams: [], scores: {}, shown: -1, prevShown: -1,
+  live: { round: -1, step: 0, view: "play", timerEnd: null, review: null }
 });
 let S = defaultState();
 let role = "board";       // "host" | "board" | "player"
-let PNAME = "", PAD = { strokes: [], color: "#F2EDDC", size: 8, bg: "#1F2A5A" }, padOpen = false, logoSkip = false;
+let lastScrollK = "", PNAME = "", PAD = { strokes: [], color: "#F2EDDC", size: 8, bg: "#1F2A5A" }, padOpen = false, logoSkip = false;
 let ANS = {}, MARKS = {}, me = null, MY = {}, ST = {}, playerTab = "sheet", joinError = "", joining = false, prevView = "play";
 let tab = "run";
 let scoreRound = 0;
@@ -442,11 +474,18 @@ function standings(through) {
 function buildSteps(ri) {
   const r = BANK.rounds[ri]; const mode = r.forceMode || S.answerMode;
   const st = [{ t: "intro" }]; const n = r.questions.length;
+  const rv = S.revealMode === "review";
   if (r.type === "bonus") {
-    st.push({ t: "q", qi: 0, reveal: false }, { t: "timer", secs: r.timer || 150 }, { t: "collect" }, { t: "marking" });
+    st.push({ t: "q", qi: 0, reveal: false }, { t: "timer", secs: r.timer || 150 }, { t: "collect" }, { t: rv ? "roundend" : "marking" });
     return st;
   }
   if (r.type === "tiebreak") { st.push({ t: "q", qi: 0, reveal: false }, { t: "q", qi: 0, reveal: true }); return st; }
+  if (rv) {
+    for (let i = 0; i < n; i++) st.push({ t: "q", qi: i, reveal: false });
+    if (r.finale) st.push({ t: "finale" });
+    st.push({ t: "roundend" });
+    return st;
+  }
   if (mode === "each") { for (let i = 0; i < n; i++) st.push({ t: "q", qi: i, reveal: false }, { t: "q", qi: i, reveal: true }); }
   else {
     for (let i = 0; i < n; i++) st.push({ t: "q", qi: i, reveal: false });
@@ -465,9 +504,10 @@ function stepLabel(r, s) {
     case "collect": return "Hand in answer sheets";
     case "finale": return "Date reveal";
     case "marking": return "Marking";
+    case "roundend": return "End of round";
   }
 }
-const stepShort = (r, s, i) => s.t === "q" ? `${s.qi + 1}${s.reveal ? "a" : ""}` : { intro: "T", timer: "C", collect: "H", finale: "D", marking: "M" }[s.t];
+const stepShort = (r, s, i) => s.t === "q" ? `${s.qi + 1}${s.reveal ? "a" : ""}` : { intro: "T", timer: "C", collect: "H", finale: "D", marking: "M", roundend: "E" }[s.t];
 
 /* =====================================================================
    network: the host's browser is the server. Friends connect to it directly
@@ -681,6 +721,7 @@ async function onState(s) {
   try { await ensureQuiz(n.quizId); } catch (e) { return; }
   const pv = S.live.view; S = n;
   if (role === "player") {
+    if (n.live.view === "review" && pv !== "review") playerTab = "sheet";
     if (n.live.view === "scores" && pv !== "scores") playerTab = "scores"; else if (n.live.view !== "scores" && pv === "scores") playerTab = "sheet";
     if (me && !S.teams.find(t => t.id === me.teamId)) me = null;
   }
@@ -709,11 +750,11 @@ async function ensureQuiz(id) {
 
 /* ---------- answers: locking, host handling, marking ---------- */
 function answerOpen(ri, qi) {
-  const L = S.live; if (!BANK || L.round !== ri || ri < 0) return false;
+  const L = S.live; if (!BANK || L.round !== ri || ri < 0 || L.view === "review") return false;
   const steps = buildSteps(ri); const cur = Math.min(L.step, steps.length - 1);
   const first = steps.findIndex(s => s.t === "q" && s.qi === qi); if (first < 0 || first > cur) return false;
   let close = steps.length;
-  for (let i = first; i < steps.length; i++) { const s = steps[i]; if (s.t === "collect" || (s.t === "q" && s.qi === qi && s.reveal)) { close = i; break; } }
+  for (let i = first; i < steps.length; i++) { const s = steps[i]; if (s.t === "collect" || s.t === "roundend" || (s.t === "q" && s.qi === qi && s.reveal)) { close = i; break; } }
   return cur < close;
 }
 function handleHostMsg(conn, m) {
@@ -786,6 +827,13 @@ function reviewHTML(ri) {
     <div style="overflow-x:auto;margin-top:10px"><table class="sc arev"><thead><tr><th>Team</th>${head}</tr></thead><tbody>${rows}</tbody></table></div>
     ${bonus ? "" : `<div class="row" style="margin-top:14px"><button class="btn pri" data-act="usemarks" data-ri="${ri}">Use these marks as scores</button></div>`}</div>`;
 }
+function fillMarks(ph) {
+  let n = 0;
+  commit(s => { reviewRounds(ph).forEach(ri => { const r = BANK.rounds[ri]; if (r.type === "bonus") return;
+    s.teams.forEach(t => { const cur = s.scores[t.id] && s.scores[t.id][ri]; if (cur !== undefined && cur !== "") return; if (!(ANS[t.id] && ANS[t.id][ri])) return;
+      let sum = 0; r.questions.forEach((q, qi) => { sum += effMark(t.id, ri, qi); }); s.scores[t.id] = s.scores[t.id] || {}; s.scores[t.id][ri] = Math.max(r.min ?? 0, Math.min(r.max, sum)); n++; }); }); });
+  toast = n ? `Filled ${n} blank score${n > 1 ? "s" : ""} from phone answers. Check typed answers in the Score tab.` : "No blank scores to fill."; render();
+}
 function useMarks(ri) {
   const r = BANK.rounds[ri];
   commit(s => { s.teams.forEach(t => { let sum = 0; r.questions.forEach((q, qi) => { sum += effMark(t.id, ri, qi); }); s.scores[t.id] = s.scores[t.id] || {}; s.scores[t.id][ri] = Math.max(r.min ?? 0, Math.min(r.max, sum)); }); });
@@ -797,6 +845,40 @@ function cycleMark(tid, ri, qi) {
   saveHost(); render();
 }
 
+/* ---------- answer reviews at half-time and at the end ---------- */
+function reviewRounds(phase) {
+  const out = []; const from = phase === "half" ? 0 : HALF_IDX + 1; const to = phase === "half" ? HALF_IDX : SCORED - 1;
+  for (let ri = from; ri <= to; ri++) out.push(ri);
+  return out;
+}
+function reviewSteps(phase) {
+  const st = [];
+  reviewRounds(phase).forEach(ri => {
+    const r = BANK.rounds[ri]; st.push({ t: "intro", ri });
+    r.questions.forEach((q, qi) => { if (r.type === "bonus") st.push({ t: "q", ri, qi, reveal: true }); else st.push({ t: "q", ri, qi, reveal: false }, { t: "q", ri, qi, reveal: true }); });
+  });
+  st.push({ t: "rend" });
+  return st;
+}
+function reviewCur() { const rv = S.live.review; if (!rv) return null; const steps = reviewSteps(rv.phase); const i = Math.max(0, Math.min(rv.step, steps.length - 1)); return { rv, steps, i, s: steps[i] }; }
+const phaseName = ph => ph === "half" ? "Half-time answers" : "Final answers";
+function roundName(ri) { const r = BANK.rounds[ri]; return r.type === "bonus" ? "Bonus round" : `Round ${ri + 1}`; }
+function howItWorks(compact) {
+  const extras = [];
+  BANK.rounds.forEach((r, ri) => {
+    if (r.questions.some(q => q.connection)) extras.push(`${r.title}: spot the link between the answers for a bonus point.`);
+    if (r.type === "bonus") extras.push(`${r.title}: ${r.rule}`);
+  });
+  const steps = [
+    ["Make your team", "Scan the code. One phone per team. Pick a fun name and draw a team logo."],
+    ["Answer on your phone", "Questions appear on this screen. Tap or type your answer. You can change it until the round ends."],
+    ["Play your joker", "Each team can double the points for one round. Tell the quizmaster before that round starts."],
+    ["Answers at half-time and at the end", `After round ${HALF_IDX + 1} we go through the answers together, then reveal the scores. Same again at the end.`],
+    ...extras.map(e => ["Special round", e]),
+    ["No googling", "Phones are for answering only. Honour system, cheats."]
+  ];
+  return `<ol class="how ${compact ? "compact" : ""}">${steps.map(([h, b], i) => `<li><span class="hn num">${i + 1}</span><div><b>${esc(h)}</b><span>${esc(b)}</span></div></li>`).join("")}</ol>`;
+}
 /* =====================================================================
    board
    ===================================================================== */
@@ -827,17 +909,17 @@ function optsHTML(q, reveal) {
   const mx = Math.max(...q.opts.map(o => o.length));
   return `<ol class="opts ${mx > 24 ? "xl" : mx > 14 ? "l" : ""} ${reveal ? "rev" : ""}">${q.opts.map((o, i) => `<li class="${reveal ? (i === q.c ? "right" : "wrong") : ""}"><b>${LET[i]}</b><span>${esc(o)}</span></li>`).join("")}</ol>`;
 }
-function stageHTML() {
-  const L = S.live; const r = BANK.rounds[L.round]; const steps = buildSteps(L.round);
-  const s = steps[Math.min(L.step, steps.length - 1)];
+function stageHTML(ri0, s0) {
+  const L = S.live; const ri = ri0 === undefined ? L.round : ri0; const r = BANK.rounds[ri]; const steps = buildSteps(ri);
+  const s = s0 || steps[Math.min(L.step, steps.length - 1)];
   const eb = (t, d) => `<div class="eyebrow">${esc(t)}</div>${d && deco() ? '<div class="dd" aria-hidden="true"><i></i></div>' : ""}`;
   if (s.t === "intro") {
-    const num = r.type === "tiebreak" ? "Tiebreaker" : r.type === "bonus" ? "Bonus" : `Round ${L.round + 1}`;
+    const num = r.type === "tiebreak" ? "Tiebreaker" : r.type === "bonus" ? "Bonus" : `Round ${ri + 1}`;
     return `<section class="frame stage">${decoTop()}${eb(num, 1)}<h1 class="big ${r.title.length > 20 ? "long" : ""}">${esc(r.title)}</h1><p class="rule">${esc(r.rule)}</p></section>`;
   }
   if (s.t === "q") {
     const q = r.questions[s.qi]; const n = r.questions.length;
-    const label = q.connection ? "The secret connection" : r.type === "bonus" ? "The challenge" : r.type === "tiebreak" ? "Closest answer wins" : `Question ${s.qi + 1} of ${n}${s.phase === "answers" ? " · answers" : ""}`;
+    const label = (s.pre ? s.pre + " · " : "") + (q.connection ? "The secret connection" : r.type === "bonus" ? "The challenge" : r.type === "tiebreak" ? "Closest answer wins" : `Question ${s.qi + 1} of ${n}${s.phase === "answers" ? " · answers" : ""}`);
     const photo = r.type === "picture" && !q.vis ? `<div class="photo">Look at the host's screen</div>` : "";
     if (q.opts) {
       return `<section class="frame stage mcq ${s.reveal ? "done" : ""} lay-${r.layout || "std"}">${decoTop()}${eb(label)}<div class="mcqrow">${q.vis ? visHTML(q, false, r, s.reveal, s.qi) : ""}<div class="mcqtxt"><p class="qtext ${q.vis ? "" : "wide"}">${esc(q.q)}</p>${optsHTML(q, s.reveal)}</div></div></section>`;
@@ -850,9 +932,19 @@ function stageHTML() {
   }
   if (s.t === "collect") return `<section class="frame stage">${decoTop()}${eb(r.type === "bonus" ? "Time" : "Pens down", 1)}<h1 class="big">${r.type === "bonus" ? "Time is up" : "Hand in your sheets"}</h1><p class="sub">Marking comes next.</p></section>`;
   if (s.t === "finale") return `<section class="frame stage">${decoTop()}${eb("Put your first three answers together", 1)}<h1 class="big num">01 / 19 / 2021</h1><p class="sub">What happened on that date?</p></section>`;
-  if (s.t === "marking") return `<section class="frame stage">${decoTop()}${eb(`Round ${L.round + 1}`, 1)}<h1 class="big">Marking</h1><p class="sub">Scores are next.</p></section>`;
+  if (s.t === "marking") return `<section class="frame stage">${decoTop()}${eb(`Round ${ri + 1}`, 1)}<h1 class="big">Marking</h1><p class="sub">Scores are next.</p></section>`;
+  if (s.t === "roundend") return `<section class="frame stage">${decoTop()}${eb(r.type === "bonus" ? "Bonus round" : `Round ${ri + 1}`, 1)}<h1 class="big">Pens down</h1><p class="sub">${ri <= HALF_IDX ? "We go through the answers at half-time." : "We go through the answers at the end."}</p></section>`;
   return "";
 }
+function reviewStage() {
+  const c = reviewCur(); if (!c) return "";
+  const eb = t => `<div class="eyebrow">${esc(t)}</div>${deco() ? '<div class="dd" aria-hidden="true"><i></i></div>' : ""}`;
+  const s = c.s;
+  if (s.t === "intro") { const r = BANK.rounds[s.ri]; return `<section class="frame stage">${decoTop()}${eb(phaseName(c.rv.phase) + " · " + roundName(s.ri))}<h1 class="big ${r.title.length > 20 ? "long" : ""}">${esc(r.title)}</h1><p class="sub">Check your phones as we reveal each answer.</p></section>`; }
+  if (s.t === "rend") return `<section class="frame stage">${decoTop()}${eb(phaseName(c.rv.phase))}<h1 class="big">That's all the answers</h1><p class="sub">${c.rv.phase === "half" ? "Half-time scores are next." : "The final scores are next."}</p></section>`;
+  return stageHTML(s.ri, { t: "q", qi: s.qi, reveal: s.reveal, pre: roundName(s.ri) });
+}
+
 const fmt = secs => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
 function tickClock() {
   const el = $("#clock"); if (!el) return;
@@ -892,17 +984,19 @@ function animateRows() {
 }
 function renderBoard() {
   const L = S.live;
-  let scene = L.view === "scores" ? "scores" : L.view === "join" ? "join" : L.round < 0 ? "lobby" : "play";
+  let scene = L.view === "scores" ? "scores" : L.view === "join" ? "join" : L.view === "review" && L.review ? "review" : L.view === "rules" ? "rules" : L.round < 0 ? "lobby" : "play";
   let body = "";
   if (scene === "scores") body = `<div class="bbody">${standingsScene()}</div>`;
+  else if (scene === "review") body = `<div class="bbody">${reviewStage()}</div>`;
+  else if (scene === "rules") body = `<div class="bbody"><section class="frame stage rulesc">${decoTop()}<div class="eyebrow">How it works</div>${howItWorks()}</section></div>`;
   else if (scene === "join") body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="eyebrow">Join the quiz</div><h1 class="big">Scan to join</h1>${joinPanel()}</section></div>`;
   else if (scene === "lobby") {
-    body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="lobby"><div class="lobl"><div class="eyebrow">Tonight</div><h1 class="big ${BANK.title.length > 16 ? "long" : ""}">${esc(BANK.title)}</h1><p class="rule">${esc(BANK.intro || "")}</p>${S.teams.length ? `<div class="lobbyteams">${S.teams.map(t => `<div class="lt">${logoHTML(t, "lg")}<span>${esc(t.name)}</span></div>`).join("")}</div>` : `<p class="sub">Teams appear here as they join.</p>`}</div><div class="lobr">${joinPanel()}</div></div></section></div>`;
+    body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="lobby"><div class="lobl"><div class="eyebrow">Tonight</div><h1 class="big ${BANK.title.length > 16 ? "long" : ""}">${esc(BANK.title)}</h1><p class="rule">${esc(BANK.intro || "")}</p><div class="howwrap"><div class="eyebrow" style="margin-bottom:8px">How it works</div>${howItWorks(true)}</div></div><div class="lobr">${joinPanel()}${S.teams.length ? `<div class="lobbyteams">${S.teams.map(t => `<div class="lt">${logoHTML(t, "lg")}<span>${esc(t.name)}</span></div>`).join("")}</div>` : `<p class="rule">Teams appear here as they join.</p>`}</div></div></section></div>`;
   } else {
     const side = "";
     body = `<div class="bbody ${side ? "split" : ""}">${stageHTML()}${side}</div>`;
   }
-  setApp(`<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`);
+  setApp(`<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : scene === "rules" ? "How it works" : scene === "review" ? phaseName(L.review.phase) : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`);
   tickClock();
   if (scene === "scores" && (boardLast.scene !== "scores" || boardLast.shown !== S.shown)) animateRows();
   boardLast = { scene, shown: S.shown };
@@ -936,9 +1030,9 @@ function actions() {
     start(ri) { commit(s => { s.live = { round: ri, step: 0, view: "play", timerEnd: null }; }); tab = "run"; },
     next() {
       commit(s => {
-        if (s.live.round < 0) { s.live = { round: 0, step: 0, view: "play", timerEnd: null }; return; }
+        if (s.live.round < 0) { s.live = { round: 0, step: 0, view: "play", timerEnd: null, review: null }; return; }
         const n = buildSteps(s.live.round).length; s.live.view = "play";
-        if (s.live.step < n - 1) s.live.step++; else if (s.live.round < BANK.rounds.length - 1 && BANK.rounds[s.live.round].type !== "tiebreak") { /* stay: host chooses scoring */ }
+        if (s.live.step < n - 1) s.live.step++; else if (S.revealMode === "review" && s.live.round < SCORED - 1) { s.live.round++; s.live.step = 0; }
       });
     },
     back() { commit(s => { s.live.view = "play"; if (s.live.step > 0) s.live.step--; }); },
@@ -949,6 +1043,12 @@ function actions() {
       if (idx >= 0) commit(s => { s.live.step = idx; });
     },
     toggleJoin() { commit(s => { s.live.view = s.live.view === "join" ? "play" : "join"; }); },
+    startReview(ph) { commit(s => { s.live.view = "review"; s.live.review = { phase: ph, step: 0 }; }); },
+    rnext() { const c = reviewCur(); if (!c) return; if (c.i < c.steps.length - 1) commit(s => { s.live.review.step = c.i + 1; s.live.view = "review"; }); },
+    rback() { const c = reviewCur(); if (!c) return; if (c.i > 0) commit(s => { s.live.review.step = c.i - 1; s.live.view = "review"; }); },
+    rgo(i) { commit(s => { s.live.review.step = i; s.live.view = "review"; }); },
+    exitReview() { commit(s => { s.live.view = "play"; }); },
+    toggleRules() { commit(s => { s.live.view = s.live.view === "rules" ? "play" : "rules"; }); },
     revealHalf() { commit(s => { s.prevShown = -1; s.shown = HALF_IDX; s.live.view = "scores"; }); },
     revealFinal() { commit(s => { s.prevShown = s.shown >= 0 && s.shown < SCORED - 1 ? s.shown : -1; s.shown = SCORED - 1; s.live.view = "scores"; }); },
     toggleScores() { commit(s => { s.live.view = s.live.view === "scores" ? "play" : "scores"; }); },
@@ -961,9 +1061,10 @@ function runTab() {
   const c = curStep(); const L = S.live;
   const lobby = L.round < 0;
   let top = "";
+  if (L.view === "review" && L.review) return reviewPanel();
   if (lobby) {
-    top = `<div class="panel"><h3>Ready when you are</h3><p class="note">The board shows the title card. Add your teams first, then start round one.</p>
-      <div class="ctrls" style="margin-top:14px"><button class="btn pri" data-act="next">${ic("play")}Start round 1</button><button class="btn" data-tab="teams">Add teams</button></div></div>`;
+    top = `<div class="panel"><h3>Ready when you are</h3><p class="note">The board shows the title card, how it works and the join code. Teams join from their phones.</p>
+      <div class="ctrls" style="margin-top:14px"><button class="btn pri" data-act="next">${ic("play")}Start round 1</button><button class="btn ${L.view === "rules" ? "pri" : ""}" data-act="toggleRules">${L.view === "rules" ? "Back to title card" : "Show how it works full screen"}</button><button class="btn" data-tab="teams">Teams</button></div></div>`;
   } else {
     const r = BANK.rounds[L.round]; const s = c.s; const q = s.t === "q" ? r.questions[s.qi] : null;
     const isLast = c.i === c.steps.length - 1;
@@ -982,7 +1083,7 @@ function runTab() {
           <button class="btn ico" data-act="back" aria-label="Previous step" ${c.i === 0 ? "disabled" : ""}>${ic("left")}</button>
           ${canReveal ? `<button class="btn" data-act="reveal">${ic("eye")}Reveal answer</button>` : ""}
           ${s.t === "timer" ? (L.timerEnd ? `<button class="btn" data-act="timer0">Reset clock</button>` : `<button class="btn pri" data-act="timer1">Start ${fmt(s.secs)} clock</button>`) : ""}
-          <button class="btn ${canReveal ? "" : "pri"}" data-act="next" ${isLast ? "disabled" : ""}>Next${ic("right")}</button>
+          <button class="btn ${canReveal ? "" : "pri"}" data-act="next" ${isLast && !(S.revealMode === "review" && L.round < SCORED - 1) ? "disabled" : ""}>${isLast && S.revealMode === "review" && L.round < SCORED - 1 ? "Next round" : "Next"}${ic("right")}</button>
           ${isLast ? `<button class="btn pri" data-tab="score" data-sr="${L.round}">Score this round</button>` : ""}
         </div>
         <div class="kbd"><b>←</b> <b>→</b> step · <b>Space</b> reveal · <b>S</b> scores on the board</div>
@@ -997,16 +1098,33 @@ function runTab() {
 }
 function revealBlock() {
   const L = S.live; const halfDone = S.shown >= HALF_IDX; const finalDone = S.shown >= SCORED - 1;
-  const sugHalf = !halfDone && L.round >= HALF_IDX; const sugFinal = halfDone && !finalDone && L.round >= SCORED - 1;
+  const atHalf = !halfDone && (L.round > HALF_IDX || (L.round === HALF_IDX && curStep() && curStep().i === curStep().steps.length - 1));
+  const atEnd = halfDone && !finalDone && L.round >= SCORED - 1;
   const mh = missingScores(HALF_IDX), mf = missingScores(SCORED - 1);
-  const need = n => n ? ` · ${n} round${n > 1 ? "s" : ""} still need scores` : "";
-  return `<h3>Scoreboard</h3><p class="note">Scores stay hidden on the TV and on phones until you reveal them.</p>
-    <div class="ctrls" style="margin-top:12px">
-      <button class="btn ${sugHalf ? "pri" : ""}" data-act="revealHalf">${ic("list")}Reveal half-time scores</button>
-      <button class="btn ${sugFinal ? "pri" : ""}" data-act="revealFinal">${ic("list")}Reveal final scores</button>
-      ${L.view === "scores" ? `<button class="btn" data-act="toggleScores">Back to the quiz</button>` : ""}
-    </div>
-    <p class="note" style="margin-top:10px">Half-time: after round ${HALF_IDX + 1}${halfDone ? " · revealed" : need(mh)}.<br>Final: after ${afterWord(SCORED - 1)}${finalDone ? " · revealed" : halfDone ? need(mf) : ""}.</p>`;
+  const need = n => n ? `<span class="warn">${n} round${n > 1 ? "s" : ""} still need scores</span>` : "";
+  const row = (ph, title, on, done, miss, revealAct) => `<div class="phase ${on ? "on" : ""}"><div class="pt"><b>${title}</b>${done ? `<span class="okk">Scores revealed</span>` : need(miss)}</div>
+    <div class="ctrls"><button class="btn ${on ? "pri" : ""}" data-act="review" data-ph="${ph}">${ic("eye")}1. Go through answers</button><button class="btn" data-act="fillmarks" data-ph="${ph}">2. Fill scores from phones</button><button class="btn ${on && L.view === "review" ? "pri" : ""}" data-act="${revealAct}">${ic("list")}3. Reveal scores</button></div></div>`;
+  return `<h3>Half-time and final</h3><p class="note">Answers and scores stay hidden until you go through them here.</p>
+    ${row("half", `Half-time · after round ${HALF_IDX + 1}`, atHalf, halfDone, mh, "revealHalf")}
+    ${row("final", `Final · after ${afterWord(SCORED - 1)}`, atEnd, finalDone, mf, "revealFinal")}
+    ${L.view === "scores" || L.view === "review" ? `<div class="ctrls" style="margin-top:10px"><button class="btn" data-act="exitReview">Back to the quiz</button></div>` : ""}
+    <span class="toast">${esc(toast)}</span>`;
+}
+function reviewPanel() {
+  const c = reviewCur(); const s = c.s;
+  let what = "", ans = "";
+  if (s.t === "intro") what = `${roundName(s.ri)}: ${BANK.rounds[s.ri].title}`;
+  else if (s.t === "rend") what = "That's all the answers.";
+  else { const q = BANK.rounds[s.ri].questions[s.qi]; what = q.q; ans = `<div class="ansbox"><small>Answer</small><b style="font-weight:500">${q.opts ? LET[q.c] + ": " : ""}${esc(q.a)}</b><small style="margin-top:4px">${s.reveal ? "Showing on the board" : "Hidden. Press Reveal answer."}</small></div>`; }
+  const nx = c.steps[c.i + 1]; const nextIsReveal = nx && nx.t === "q" && nx.reveal && s.t === "q" && nx.qi === s.qi && nx.ri === s.ri;
+  const last = c.i === c.steps.length - 1;
+  return `<div class="grid2"><div class="panel"><div class="now"><small>${esc(phaseName(c.rv.phase))} · step ${c.i + 1} of ${c.steps.length}${s.ri !== undefined ? " · " + esc(roundName(s.ri)) : ""}</small>${esc(what)}</div>${ans}
+      <div class="ctrls" style="margin-top:16px"><button class="btn ico" data-act="rback" aria-label="Previous" ${c.i === 0 ? "disabled" : ""}>${ic("left")}</button>
+      ${last ? `<button class="btn pri" data-act="${c.rv.phase === "half" ? "revealHalf" : "revealFinal"}">${ic("list")}Reveal ${c.rv.phase === "half" ? "half-time" : "final"} scores</button>` : `<button class="btn pri" data-act="rnext">${nextIsReveal ? `${ic("eye")}Reveal answer` : `Next${ic("right")}`}</button>`}
+      <button class="btn" data-act="exitReview">Leave answers</button></div>
+      <div class="kbd"><b>→</b> or <b>Space</b> next · <b>←</b> back</div>
+      ${last ? `<p class="note" style="margin-top:12px">Before revealing, check typed answers in the Score tab or press "Fill scores from phones".</p>` : ""}</div>
+    <div class="panel">${revealBlock()}<h3 style="margin-top:18px">Jump to</h3><ul class="steplist">${c.steps.map((x, k) => x.t === "intro" ? `<li><button class="${k === c.i ? "cur" : k < c.i ? "done" : ""}" data-rgo="${k}" aria-label="${esc(roundName(x.ri))}">R${x.ri + 1}</button></li>` : "").join("")}</ul></div></div>`;
 }
 function scoreTab() {
   const ri0 = Math.min(scoreRound, SCORED - 1);
@@ -1042,7 +1160,10 @@ function settingsTab() {
   const base = joinURL();
   const flags = []; BANK.rounds.forEach((r, ri) => r.questions.forEach((q, qi) => { if (q.flag) flags.push({ ri, qi, q, r }); }));
   return `<div class="grid2"><div style="display:flex;flex-direction:column;gap:20px">
-    <div class="panel"><h3>Answers</h3>
+    <div class="panel"><h3>When to reveal answers</h3>
+      <label class="row" style="min-height:44px"><input type="radio" name="rm" value="review" ${S.revealMode === "review" ? "checked" : ""}> At half-time and at the end, like a pub quiz</label>
+      <label class="row" style="min-height:44px"><input type="radio" name="rm" value="live" ${S.revealMode !== "review" ? "checked" : ""}> During each round</label>
+      <p class="note" style="margin-bottom:10px">If you reveal during each round:</p>
       <label class="row" style="min-height:44px"><input type="radio" name="am" value="each" ${S.answerMode === "each" ? "checked" : ""}> Reveal after each question</label>
       <label class="row" style="min-height:44px"><input type="radio" name="am" value="end" ${S.answerMode === "end" ? "checked" : ""}> Collect sheets, then reveal at the end of the round</label>
       <p class="note">The picture round and bonus round always use sheets at the end.</p></div>
@@ -1085,10 +1206,11 @@ document.addEventListener("click", e => {
   if (role !== "host") return;
   const t = e.target.closest("button"); if (!t) return;
   const d = t.dataset;
-  if (d.act) { if (d.act === "next") A.next(); else if (d.act === "back") A.back(); else if (d.act === "reveal") A.reveal(); else if (d.act === "toggleScores") A.toggleScores(); else if (d.act === "revealHalf") A.revealHalf(); else if (d.act === "revealFinal") A.revealFinal(); else if (d.act === "toggleJoin") A.toggleJoin(); else if (d.act === "usemarks") useMarks(+d.ri); else if (d.act === "timer1") A.timer(true); else if (d.act === "timer0") A.timer(false); else if (d.act === "newroom") { code = newCode(); saveHost(); Net.host(code); render(); } return; }
+  if (d.act) { if (d.act === "next") A.next(); else if (d.act === "back") A.back(); else if (d.act === "reveal") A.reveal(); else if (d.act === "toggleScores") A.toggleScores(); else if (d.act === "revealHalf") A.revealHalf(); else if (d.act === "rnext") A.rnext(); else if (d.act === "rback") A.rback(); else if (d.act === "exitReview") A.exitReview(); else if (d.act === "toggleRules") A.toggleRules(); else if (d.act === "review") A.startReview(d.ph); else if (d.act === "fillmarks") fillMarks(d.ph); else if (d.act === "revealFinal") A.revealFinal(); else if (d.act === "toggleJoin") A.toggleJoin(); else if (d.act === "usemarks") useMarks(+d.ri); else if (d.act === "timer1") A.timer(true); else if (d.act === "timer0") A.timer(false); else if (d.act === "newroom") { code = newCode(); saveHost(); Net.host(code); render(); } return; }
   if (d.tab) { tab = d.tab; if (d.sr !== undefined) scoreRound = +d.sr; return render(); }
   if (d.start !== undefined) { A.start(+d.start); return; }
   if (d.go !== undefined) return A.go(+d.go);
+  if (d.rgo !== undefined) return A.rgo(+d.rgo);
   if (d.sr !== undefined) { scoreRound = +d.sr; toast = ""; return render(); }
   if (d.inc || d.dec) { const id = d.inc || d.dec; bump(id, d.inc ? 1 : -1); return; }
   if (d.joker) { const ri = Math.min(scoreRound, SCORED - 1); commit(s => { const tm = s.teams.find(x => x.id === d.joker); tm.joker = tm.joker === ri ? null : ri; }); return; }
@@ -1107,15 +1229,17 @@ document.addEventListener("change", e => {
   if (el.dataset.score) setScore(el.dataset.score, el.value);
   if (el.dataset.rename) commit(s => { const tm = s.teams.find(x => x.id === el.dataset.rename); if (tm && el.value.trim()) tm.name = el.value.trim().slice(0, 32); });
   if (el.name === "am") commit(s => { s.answerMode = el.value; s.live.step = 0; });
+  if (el.name === "rm") commit(s => { s.revealMode = el.value; s.live.step = 0; });
 });
 document.addEventListener("keydown", e => {
   if (role !== "host") return;
   const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
   if (e.target.id === "newteam" && e.key === "Enter") return addTeam();
   if (typing || tab !== "run" || e.metaKey || e.ctrlKey) return;
-  if (e.key === "ArrowRight") { e.preventDefault(); A.next(); }
-  else if (e.key === "ArrowLeft") { e.preventDefault(); A.back(); }
-  else if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); A.reveal(); }
+  const inReview = S.live.view === "review" && S.live.review;
+  if (e.key === "ArrowRight") { e.preventDefault(); inReview ? A.rnext() : A.next(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); inReview ? A.rback() : A.back(); }
+  else if (e.key === " " && !e.target.closest("button")) { e.preventDefault(); inReview ? A.rnext() : A.reveal(); }
   else if (e.key === "s" || e.key === "S") A.toggleScores();
 });
 function clampScore(ri, v) { const r = BANK.rounds[ri]; return Math.max(r.min ?? 0, Math.min(r.max, v)); }
@@ -1208,6 +1332,29 @@ function qlineHTML(r, ri, qi, past) {
   const field = r.type === "bonus" ? `<textarea data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" placeholder="One station per line">${esc(v)}</textarea>` : `<input data-fk="a-${ri}-${qi}" data-pa="${ri}|${qi}" ${open ? "" : "disabled"} aria-label="${label}" autocomplete="off" autocapitalize="sentences" value="${esc(v)}" placeholder="${q.connection ? "What links the answers?" : ""}">`;
   return `<div class="qline ${past ? "past" : ""} ${q.connection ? "conn" : ""} ${open ? "" : "locked"}">${head}${txt}${field}${st}</div>`;
 }
+function reviewSummaryHTML() {
+  const c = reviewCur(); const ph = c.rv.phase;
+  const revealed = new Set(); c.steps.slice(0, c.i + 1).forEach(s => { if (s.t === "q" && s.reveal) revealed.add(s.ri + "-" + s.qi); });
+  const done = new Set(ph === "final" ? reviewRounds("half") : []);
+  const rounds = ph === "half" ? reviewRounds("half") : reviewRounds("half").concat(reviewRounds("final"));
+  const curK = c.s.t === "q" ? c.s.ri + "-" + c.s.qi : "";
+  let right = 0, shown = 0;
+  const blocks = rounds.map(ri => {
+    const r = BANK.rounds[ri];
+    const rows = r.questions.map((q, qi) => {
+      const k = ri + "-" + qi; const open = done.has(ri) || revealed.has(k);
+      const mine = (MY[ri] && MY[ri][qi]) || "";
+      const mineTxt = q.opts ? (mine ? `${mine}: ${q.opts[LET.indexOf(mine)] || ""}` : "") : mine;
+      let mark = "";
+      if (open && q.opts) { const ok = mine === LET[q.c]; mark = ok ? `<span class="tick" aria-label="Correct">✓</span>` : `<span class="cross" aria-label="Wrong">✗</span>`; shown++; if (ok) right++; }
+      const label = q.connection ? "Connection" : r.type === "bonus" ? "Bonus" : `Q${qi + 1}`;
+      return `<div class="rvq ${k === curK ? "now" : ""} ${open ? "open" : ""}" data-k="${k}"><div class="rvh"><span class="qn">${label}</span>${mark}</div>
+        <p class="qt">${esc(q.q)}</p><div class="rva"><span>You: <b>${mineTxt ? esc(mineTxt).replace(/\n/g, ", ") : "no answer"}</b></span>${open ? `<span class="rvc">Answer: <b>${q.opts ? LET[q.c] + ": " : ""}${esc(q.a)}</b></span>` : `<span class="rvc wait">Answer coming up</span>`}</div></div>`;
+    }).join("");
+    return `<div class="rvr"><div class="eyebrow">${esc(roundName(ri))} · ${esc(r.title)}</div>${rows}</div>`;
+  }).join("");
+  return `<section class="frame rv" style="padding:14px 16px"><h2 class="ph2">${esc(phaseName(ph))}</h2><p class="note">Follow along as the quizmaster reveals each answer.${shown ? ` Multiple choice so far: <b>${right} of ${shown}</b> right.` : ""}</p>${blocks}</section>`;
+}
 function playerHTML() {
   const head = `<div class="phead"><div class="mark">${esc(BANK.title)}</div><div class="tm">Room ${esc(code)}</div></div>`;
   const err = joinError ? `<p class="note" role="alert" style="color:#e58f8f;margin-top:10px">${esc(joinError)}</p>` : "";
@@ -1232,7 +1379,8 @@ function playerHTML() {
   if (playerTab === "scores") {
     if (S.shown < 0) body = `<p class="note">Scores are revealed at half-time and at the end.</p>`;
     else { const rows = standings(S.shown); body = `<section class="frame psc" style="padding:16px"><div class="sub" style="font-size:14px;color:var(--iv3);margin-bottom:6px">${esc(standLabel(S.shown))}</div>${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""} ${r.id === me.teamId ? "me" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${logoHTML(teamOf(r.id))}<span>${esc(r.name)}</span></span><span class="tt">${r.total}</span></div>`).join("")}</section>`; }
-  } else if (L.round < 0) body = `<p class="note">The quiz has not started. Your answer sheet will appear here.</p>`;
+  } else if (L.view === "review" && L.review) body = reviewSummaryHTML();
+  else if (L.round < 0) body = `<p class="note">The quiz has not started yet. Your answer sheet will appear here.</p><section class="frame" style="padding:16px 18px"><div class="eyebrow" style="margin-bottom:6px">How it works</div>${howItWorks()}</section>`;
   else {
     const ri = L.round; const r = BANK.rounds[ri]; const qs = visibleQs(ri);
     const cur = qs[qs.length - 1]; const past = qs.slice(0, -1).reverse();
@@ -1248,6 +1396,7 @@ function renderPlayer() {
   if (fk) { const el = $(`[data-fk="${fk}"]`); if (el && !el.disabled) { if (val !== null) el.value = val; el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
   $$("[data-st]").forEach(el => { const [a, b] = el.dataset.st.split("-"); setStatus(a, b); });
   padBind();
+  const nw = $(".rv .now"); if (nw && nw.dataset.k !== lastScrollK) { lastScrollK = nw.dataset.k; nw.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" }); }
 }
 function sendAnswerNow(ri, qi, text) {
   MY[ri] = MY[ri] || {}; MY[ri][qi] = text; ST[ri + "-" + qi] = "sending";

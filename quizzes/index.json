@@ -13,6 +13,13 @@
       "description": "Eleven multiple-choice rounds: geography, music, fonts, history, Pantone colours, films, sport, flags, news, landmarks and a secret connection.",
       "meta": "55 questions plus a secret connection",
       "status": "ready"
+    },
+    {
+      "id": "nov2026",
+      "title": "The Big Pub Quiz: 2026 Edition",
+      "description": "11 rounds: geography maps, Eurovision, history, 2026 music, pop culture, recent films, Pantone, flags, animal news, picture objects and a secret connection.",
+      "meta": "55 multiple-choice questions + 1 secret connection bonus",
+      "status": "ready"
     }
   ]
 }

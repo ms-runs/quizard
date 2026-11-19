@@ -3,7 +3,7 @@ window.QUIZ = {
   "id": "birthday2026",
   "theme": "deco",
   "title": "Paulina’s Birthday Pub Quiz · 2026",
-  "intro": "Eight rounds, forty questions. Expect maps, 2000s bangers, medicine, food, 2026 headlines, adorable animal stories, Pantone colours and one secret birthday bouquet. One joker per team, same classic Quizard scoring.",
+  "intro": "Eight rounds, forty questions. Expect maps, 2000s bangers, medicine, food, 2026 headlines, adorable animal stories, Pantone colours and one secret-connection finale. One joker per team, same classic Quizard scoring.",
   "rounds": [
     {
       "id": "passport",
@@ -549,88 +549,99 @@ window.QUIZ = {
       "layout": "pantone"
     },
     {
-      "id": "bouquet",
-      "title": "The Secret Bouquet",
+      "id": "orchard",
+      "title": "The Final Five",
       "type": "standard",
       "max": 6,
-      "rule": "Five normal questions worth 1 point each, plus a +1 bonus for the common theme.",
+      "forceMode": "end",
+      "rule": "Five unrelated questions worth one point each, plus one bonus point for naming the hidden connection. Answers remain hidden until the end.",
+      "introCard": "quizzes/birthday2026/cards/08_final_five_intro.svg",
       "questions": [
         {
-          "q": "What is the surname of Guns N’ Roses frontman Axl?",
+          "q": "Hokusai’s famous woodblock print The Great Wave off Kanagawa is part of a series depicting which Japanese mountain?",
           "opts": [
-            "Tyler",
-            "Rose",
-            "Mercury",
-            "Hagar"
-          ],
-          "c": 1,
-          "a": "Rose",
-          "note": "Link word: ROSE."
-        },
-        {
-          "q": "What is the first name of actress Collins, star of Emily in Paris?",
-          "opts": [
-            "Lily",
-            "Emma",
-            "Zoey",
-            "Lucy"
-          ],
-          "c": 0,
-          "a": "Lily",
-          "note": "Link word: LILY."
-        },
-        {
-          "q": "What is the name for the coloured ring surrounding the pupil of the eye?",
-          "opts": [
-            "Retina",
-            "Cornea",
-            "Iris",
-            "Sclera"
-          ],
-          "c": 2,
-          "a": "Iris",
-          "note": "Link word: IRIS."
-        },
-        {
-          "q": "What is the first name of the Trolls princess voiced by Anna Kendrick?",
-          "opts": [
-            "Rosie",
-            "Daisy",
-            "Ruby",
-            "Poppy"
+            "Mount Aso",
+            "Mount Hakusan",
+            "Mount Tate",
+            "Mount Fuji"
           ],
           "c": 3,
-          "a": "Poppy",
-          "note": "Link word: POPPY."
+          "a": "Fuji",
+          "note": "The Great Wave is part of Thirty-six Views of Mount Fuji.",
+          "source": "https://www.metmuseum.org/art/collection/search/39799"
         },
         {
-          "q": "What is the first name of the Parr family daughter in The Incredibles?",
+          "q": "Miles Davis’s influential 1959 album Kind of Blue is a landmark of which musical genre?",
           "opts": [
-            "Helen",
-            "Violet",
-            "Edna",
-            "Mirage"
+            "Soul",
+            "Jazz",
+            "Funk",
+            "Blues"
           ],
           "c": 1,
-          "a": "Violet",
-          "note": "Link word: VIOLET."
+          "a": "Jazz",
+          "note": "Kind of Blue is a seminal modal-jazz album.",
+          "source": "https://www.milesdavis.com/albums/kind-of-blue/"
         },
         {
-          "q": "What is the secret common theme connecting all five correct answers?",
-          "a": "Flowers",
-          "acc": [
-            "flowers",
-            "flower",
-            "types of flowers",
-            "flower names",
-            "names of flowers",
-            "five flowers"
+          "q": "Which 2015 American television drama follows the fictional hip-hop music mogul Lucious Lyon?",
+          "opts": [
+            "Empire",
+            "Dynasty",
+            "Power",
+            "Succession"
           ],
-          "note": "Bonus +1 point. ROSE, LILY, IRIS, POPPY, VIOLET all name flowers."
+          "c": 0,
+          "a": "Empire",
+          "note": "Empire follows Lucious Lyon and his family.",
+          "source": "https://www.channel4.com/press/news/e4-acquires-break-out-hit-series-empire"
+        },
+        {
+          "q": "By what name was Salvador Dalí’s wife and artistic collaborator Elena Diakonova better known?",
+          "opts": [
+            "Dora",
+            "Leonora",
+            "Gala",
+            "Lee"
+          ],
+          "c": 2,
+          "a": "Gala",
+          "note": "Gala Dalí was Elena Diakonova.",
+          "source": "https://www.salvador-dali.org/en/dali-and-gala/gala/"
+        },
+        {
+          "q": "In Greek mythology, what was the food of the gods, traditionally paired with nectar as their drink?",
+          "opts": [
+            "Manna",
+            "Lotus",
+            "Soma",
+            "Ambrosia"
+          ],
+          "c": 3,
+          "a": "Ambrosia",
+          "note": "Ambrosia was the food of the gods.",
+          "source": "https://www.britannica.com/topic/ambrosia-Greek-mythology"
+        },
+        {
+          "q": "What connects all five correct answers?",
+          "a": "Apple varieties",
+          "acc": [
+            "apple",
+            "apples",
+            "apple types",
+            "types of apples",
+            "apple varieties",
+            "varieties of apples",
+            "apple cultivars",
+            "names of apples",
+            "apple variety"
+          ],
+          "connection": true,
+          "revealCard": "quizzes/birthday2026/cards/08_hidden_orchard_reveal.svg",
+          "note": "All five answers are apple varieties: Fuji, Jazz, Empire, Gala and Ambrosia. Accept 'apples'."
         }
       ],
-      "note": "HIDE the answers until all five are locked. Secret theme: FLOWERS (Rose, Lily, Iris, Poppy, Violet). Birthday finale. The final free-text prompt is the 6th item.",
-      "forceMode": "end"
+      "note": "HOST ONLY: All five answers are apple cultivars. Reveal connection last; intro deliberately contains no clue."
     },
     {
       "id": "tiebreak",

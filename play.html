@@ -385,6 +385,31 @@ img.tlogo{font-size:1em;width:1.7em;height:1.7em}
 .mcq.lay-std .vis.svgbox svg{height:auto;max-height:58vh}
 .vis.sm.svgbox{aspect-ratio:auto;max-width:100%;padding:6px}
 .vis.sm.svgbox svg{height:auto}
+
+/* jokers */
+.jkb{display:inline-block;background:var(--gold);color:#0A0A1E;font-weight:600;font-size:.72em;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:2px}
+.jknote{display:flex;flex-wrap:wrap;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:clamp(12px,1.4vw,20px);font-size:clamp(16px,1.6vw,24px);color:var(--iv2);animation:rise .5s var(--ease) both}
+.jknote .jkb{font-size:clamp(12px,1vw,15px)}
+.jkt{display:inline-flex;align-items:center;gap:8px;color:var(--ivory)}
+.jkt .tlogo{font-size:clamp(18px,1.8vw,28px)}.jkt .tlogo.ini{font-size:clamp(10px,.9vw,14px)}
+.jkhint{font-size:clamp(13px,1.1vw,16px)!important;opacity:.8}
+.jcard{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid var(--line2);padding:10px 14px;font-size:14px;color:var(--iv2);background:var(--s1)}
+.jcard.open{border-color:var(--gold);background:rgba(212,175,55,.1);justify-content:space-between;color:var(--ivory);font-size:15px}
+.jcard.open small{color:var(--iv3)}
+.jcard.used{border-color:var(--gold)}
+/* tonight's rounds */
+.rgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:start}
+@media (max-width:900px){.rgrid{grid-template-columns:1fr}}
+.rlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:clamp(4px,.6vw,8px)}
+.rlist li{display:flex;align-items:center;gap:12px;font-size:clamp(14px,1.35vw,21px);border-bottom:1px solid var(--line2);padding-bottom:clamp(4px,.5vw,8px)}
+.rlist .rn{flex:none;min-width:1.8em;color:var(--gold);font-weight:500}
+.rlist .rn svg{width:.9em;height:.9em}
+.rlist li.ht{color:var(--gold);border-bottom-style:dashed}
+.rlist small{margin-left:auto;color:var(--iv3);font-size:.7em}
+.rlist.anim li{animation:rise .5s var(--ease) both}
+@media (prefers-reduced-motion:reduce){.rlist.anim li{animation:none}}
+.rulesc .how b{font-size:clamp(16px,1.6vw,26px)}
+.rulesc .how li span:not(.hn){font-size:clamp(13px,1.15vw,18px)}
 </style>
 </head>
 <body>
@@ -724,6 +749,7 @@ const Net = {
       Object.keys(theirs).forEach(ri => Object.keys(theirs[ri]).forEach(qi => { MY[ri] = MY[ri] || {}; if (!MY[ri][qi]) MY[ri][qi] = theirs[ri][qi]; }));
       render();
     } else if (m.t === "nope") { joining = false; joinError = "Could not join. Check the team name and try again."; render(); }
+    else if (m.t === "jack") { if (!m.ok) { joinError = "Too late for a joker on that round."; render(); setTimeout(() => { joinError = ""; render(); }, 3000); } }
     else if (m.t === "ack") { ST[m.round + "-" + m.qi] = m.ok ? "saved" : "closed"; setStatus(m.round, m.qi); }
   }
 };
@@ -784,6 +810,14 @@ function handleHostMsg(conn, m) {
     }
     if (id) { conn._tid = id; try { conn.send({ t: "welcome", teamId: id, answers: ANS[id] || {} }); } catch (e) {} }
     else { try { conn.send({ t: "nope" }); } catch (e) {} }
+  } else if (m.t === "joker" && conn._tid) {
+    const w = jokerWindow(); const tm = S.teams.find(y => y.id === conn._tid); const ri = +m.round;
+    let ok = false;
+    if (tm && ri === w) {
+      if (m.on && (tm.joker === null || tm.joker === undefined)) { commit(s => { const x = s.teams.find(y => y.id === tm.id); x.joker = ri; }); ok = true; }
+      else if (!m.on && tm.joker === ri) { commit(s => { const x = s.teams.find(y => y.id === tm.id); x.joker = null; }); ok = true; }
+    }
+    try { conn.send({ t: "jack", ok }); } catch (e) {}
   } else if (m.t === "logo" && conn._tid && okLogo(m.logo)) {
     commit(s => { const x = s.teams.find(y => y.id === conn._tid); if (x) x.logo = m.logo; });
   } else if (m.t === "ans" && conn._tid) {
@@ -880,6 +914,30 @@ function reviewSteps(phase) {
 function reviewCur() { const rv = S.live.review; if (!rv) return null; const steps = reviewSteps(rv.phase); const i = Math.max(0, Math.min(rv.step, steps.length - 1)); return { rv, steps, i, s: steps[i] }; }
 const phaseName = ph => ph === "half" ? "Half-time answers" : "Final answers";
 function roundName(ri) { const r = BANK.rounds[ri]; return r.type === "bonus" ? "Bonus round" : `Round ${ri + 1}`; }
+const jokerOK = ri => { const r = BANK.rounds[ri]; return !!r && ri < SCORED && r.type !== "bonus" && r.type !== "tiebreak"; };
+/* A joker can be played from a team's phone while the round's title card is up, or while the previous round's "pens down" card is up. */
+function jokerWindow() {
+  const L = S.live; if (!BANK || L.view === "review" || L.view === "scores") return -1;
+  if (L.round < 0) return jokerOK(0) && (L.view === "rules") ? 0 : -1;
+  const c = curStep(); if (!c) return -1;
+  if (c.s.t === "intro" && jokerOK(L.round)) return L.round;
+  if (c.i === c.steps.length - 1 && jokerOK(L.round + 1) && !(L.round === HALF_IDX && S.shown < HALF_IDX) ) return L.round + 1;
+  return -1;
+}
+function roundsList(anim) {
+  let k = 0; const items = [];
+  BANK.rounds.forEach((r, ri) => {
+    if (r.type === "tiebreak") return;
+    items.push(`<li style="${anim ? `animation-delay:${(k++) * 0.18}s` : ""}"><span class="rn num">${r.type === "bonus" ? "B" : ri + 1}</span><span class="rt">${esc(r.title)}</span>${jokerOK(ri) ? "" : `<small>no joker</small>`}</li>`);
+    if (ri === HALF_IDX) items.push(`<li class="ht" style="${anim ? `animation-delay:${(k++) * 0.18}s` : ""}"><span class="rn">${ic("eye")}</span><span class="rt">Half-time: answers and scores</span></li>`);
+  });
+  items.push(`<li class="ht" style="${anim ? `animation-delay:${(k++) * 0.18}s` : ""}"><span class="rn">${ic("eye")}</span><span class="rt">Final answers and scores</span></li>`);
+  return `<ol class="rlist ${anim ? "anim" : ""}">${items.join("")}</ol>`;
+}
+function jokerNote(ri) {
+  const jk = S.teams.filter(t => t.joker === ri); if (!jk.length) return "";
+  return `<div class="jknote"><span class="jkb">Joker</span><span>${jk.length === 1 ? "Played by" : "Played by"}</span>${jk.map(t => `<span class="jkt">${logoHTML(t)}${esc(t.name)}</span>`).join("")}</div>`;
+}
 function howItWorks(compact) {
   const extras = [];
   BANK.rounds.forEach((r, ri) => {
@@ -889,7 +947,7 @@ function howItWorks(compact) {
   const steps = [
     ["Make your team", "Scan the code. One phone per team. Pick a fun name and draw a team logo."],
     ["Answer on your phone", "Questions appear on this screen. Tap or type your answer. You can change it until the round ends."],
-    ["Play your joker", "Each team can double the points for one round. Tell the quizmaster before that round starts."],
+    ["Play your joker", "Double one round's points. Tap Play joker on your phone when that round's title appears, before the first question. One per team."],
     ["Answers at half-time and at the end", `After round ${HALF_IDX + 1} we go through the answers together, then reveal the scores. Same again at the end.`],
     ...extras.map(e => ["Special round", e]),
     ["No googling", "Phones are for answering only. Honour system, cheats."]
@@ -932,7 +990,7 @@ function stageHTML(ri0, s0) {
   const eb = (t, d) => `<div class="eyebrow">${esc(t)}</div>${d && deco() ? '<div class="dd" aria-hidden="true"><i></i></div>' : ""}`;
   if (s.t === "intro") {
     const num = r.type === "tiebreak" ? "Tiebreaker" : r.type === "bonus" ? "Bonus" : `Round ${ri + 1}`;
-    return `<section class="frame stage">${decoTop()}${eb(num, 1)}<h1 class="big ${r.title.length > 20 ? "long" : ""}">${esc(r.title)}</h1><p class="rule">${esc(r.rule)}</p></section>`;
+    return `<section class="frame stage">${decoTop()}${eb(num, 1)}<h1 class="big ${r.title.length > 20 ? "long" : ""}">${esc(r.title)}</h1><p class="rule">${esc(r.rule)}</p>${jokerOK(ri) ? jokerNote(ri) || `<p class="rule jkhint">Jokers: play yours now on your phone if you want to double this round.</p>` : ""}</section>`;
   }
   if (s.t === "q") {
     const q = r.questions[s.qi]; const n = r.questions.length;
@@ -1005,7 +1063,7 @@ function renderBoard() {
   let body = "";
   if (scene === "scores") body = `<div class="bbody">${standingsScene()}</div>`;
   else if (scene === "review") body = `<div class="bbody">${reviewStage()}</div>`;
-  else if (scene === "rules") body = `<div class="bbody"><section class="frame stage rulesc">${decoTop()}<div class="eyebrow">How it works</div>${howItWorks()}</section></div>`;
+  else if (scene === "rules") body = `<div class="bbody"><section class="frame stage rulesc">${decoTop()}<div class="rgrid"><div><div class="eyebrow" style="margin-bottom:14px">How it works</div>${howItWorks()}</div><div><div class="eyebrow" style="margin-bottom:14px">Tonight's rounds</div>${roundsList(true)}</div></div></section></div>`;
   else if (scene === "join") body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="eyebrow">Join the quiz</div><h1 class="big">Scan to join</h1>${joinPanel()}</section></div>`;
   else if (scene === "lobby") {
     body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="lobby"><div class="lobl"><div class="eyebrow">Tonight</div><h1 class="big ${BANK.title.length > 16 ? "long" : ""}">${esc(BANK.title)}</h1><p class="rule">${esc(BANK.intro || "")}</p><div class="howwrap"><div class="eyebrow" style="margin-bottom:8px">How it works</div>${howItWorks(true)}</div></div><div class="lobr">${joinPanel()}${S.teams.length ? `<div class="lobbyteams">${S.teams.map(t => `<div class="lt">${logoHTML(t, "lg")}<span>${esc(t.name)}</span></div>`).join("")}</div>` : `<p class="rule">Teams appear here as they join.</p>`}</div></div></section></div>`;
@@ -1013,7 +1071,7 @@ function renderBoard() {
     const side = "";
     body = `<div class="bbody ${side ? "split" : ""}">${stageHTML()}${side}</div>`;
   }
-  setApp(`<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : scene === "rules" ? "How it works" : scene === "review" ? phaseName(L.review.phase) : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`);
+  setApp(`<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : scene === "rules" ? "How it works · Tonight's rounds" : scene === "review" ? phaseName(L.review.phase) : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`);
   tickClock();
   if (scene === "scores" && (boardLast.scene !== "scores" || boardLast.shown !== S.shown)) animateRows();
   boardLast = { scene, shown: S.shown };
@@ -1091,7 +1149,7 @@ function runTab() {
   let top = "";
   if (L.view === "review" && L.review) return reviewPanel();
   if (lobby) {
-    const cards = [["play", "Title card", "Quiz name, short how-it-works and the QR code."], ["rules", "How it works", "The full instructions, large."], ["join", "Join code", "A big QR code and room code."]];
+    const cards = [["play", "Title card", "Quiz name, short how-it-works and the QR code."], ["rules", "Instructions and rounds", "How it works, plus every round name so teams can plan their joker."], ["join", "Join code", "A big QR code and room code."]];
     const cur = L.view === "rules" ? "rules" : L.view === "join" ? "join" : "play";
     top = `<div class="panel"><h3>Before you start</h3><p class="note">Choose what the TV shows while teams arrive.</p>
       <div class="introcards" role="radiogroup" aria-label="Intro card">${cards.map(([k, h, b]) => `<button class="icard ${cur === k ? "on" : ""}" role="radio" aria-checked="${cur === k}" data-intro="${k}"><b>${h}</b><span>${b}</span></button>`).join("")}</div>
@@ -1113,6 +1171,7 @@ function runTab() {
         ${q && q.note ? `<p class="note">${esc(q.note)}</p>` : ""}
         ${q && q.flag ? `<div class="flag">${ic("flag")}${esc(q.flag)}</div>` : ""}
         ${s.t === "intro" && r.note ? `<p class="note">${esc(r.note)}</p>` : ""}
+        ${s.t === "intro" && jokerOK(L.round) ? `<p class="note">${S.teams.filter(t => t.joker === L.round).length ? "Jokers on this round: " + esc(S.teams.filter(t => t.joker === L.round).map(t => t.name).join(", ")) : "No jokers on this round yet. Teams can play one from their phones while this card is up."}</p>` : ""}
         ${s.t === "finale" && r.note ? `<p class="note">${esc(r.note)}</p>` : ""}
         <div class="ctrls" style="margin-top:16px">
           <button class="btn ico" data-act="back" aria-label="Previous step" ${c.i === 0 ? "disabled" : ""}>${ic("left")}</button>
@@ -1401,6 +1460,16 @@ function reviewSummaryHTML() {
   }).join("");
   return `<section class="frame rv" style="padding:14px 16px"><h2 class="ph2">${esc(phaseName(ph))}</h2><p class="note">Follow along as the quizmaster reveals each answer.${shown ? ` Multiple choice so far: <b>${right} of ${shown}</b> right.` : ""}</p>${blocks}</section>`;
 }
+function jokerCard(team) {
+  if (!team || !BANK) return "";
+  const w = jokerWindow(); const used = team.joker !== null && team.joker !== undefined;
+  if (used) {
+    const canUndo = w === team.joker;
+    return `<div class="jcard used"><span class="jkb">Joker</span><span>Played on ${esc(roundName(team.joker))}: ${esc(BANK.rounds[team.joker].title)}</span>${canUndo ? `<button class="btn sm" data-joker-off="${team.joker}">Undo</button>` : ""}</div>`;
+  }
+  if (w >= 0) return `<div class="jcard open"><div><span class="jkb">Joker</span> <b>Double ${esc(roundName(w))}: ${esc(BANK.rounds[w].title)}?</b><br><small>You only get one joker. Play it before the first question appears.</small></div><button class="btn pri" data-joker-on="${w}">Play joker</button></div>`;
+  return `<div class="jcard"><span class="jkb">Joker</span><span>Unused. You can play it when a round's title appears.</span></div>`;
+}
 function playerHTML() {
   const head = `<div class="phead"><div class="mark">${esc(BANK.title)}</div><div class="tm">Room ${esc(code)}</div></div>`;
   const err = joinError ? `<p class="note" role="alert" style="color:#e58f8f;margin-top:10px">${esc(joinError)}</p>` : "";
@@ -1426,11 +1495,11 @@ function playerHTML() {
     if (S.shown < 0) body = `<p class="note">Scores are revealed at half-time and at the end.</p>`;
     else { const rows = standings(S.shown); body = `<section class="frame psc" style="padding:16px"><div class="sub" style="font-size:14px;color:var(--iv3);margin-bottom:6px">${esc(standLabel(S.shown))}</div>${rows.map(r => `<div class="srow num ${r.rank === 1 ? "top" : ""} ${r.id === me.teamId ? "me" : ""}"><span class="rk">${r.rank}${r.tie ? "=" : ""}</span><span class="tn">${logoHTML(teamOf(r.id))}<span>${esc(r.name)}</span></span><span class="tt">${r.total}</span></div>`).join("")}</section>`; }
   } else if (L.view === "review" && L.review) body = reviewSummaryHTML();
-  else if (L.round < 0) body = `<p class="note">The quiz has not started yet. Your answer sheet will appear here.</p><section class="frame" style="padding:16px 18px"><div class="eyebrow" style="margin-bottom:6px">How it works</div>${howItWorks()}</section>`;
+  else if (L.round < 0) body = `${jokerCard(team)}<p class="note">The quiz has not started yet. Your answer sheet will appear here.</p><section class="frame" style="padding:16px 18px"><div class="eyebrow" style="margin-bottom:6px">How it works</div>${howItWorks()}</section><section class="frame" style="padding:16px 18px"><div class="eyebrow" style="margin-bottom:6px">Tonight's rounds</div>${roundsList(false)}</section>`;
   else {
     const ri = L.round; const r = BANK.rounds[ri]; const qs = visibleQs(ri);
     const cur = qs[qs.length - 1]; const past = qs.slice(0, -1).reverse();
-    body = `<section class="frame" style="padding:8px 18px"><div class="eyebrow" style="padding-top:12px">${esc(r.type === "bonus" ? "Bonus round" : "Round " + (ri + 1))}</div><div style="font-size:20px;margin:2px 0 8px">${esc(r.title)}</div>` +
+    body = jokerCard(team) + (joinError ? `<p class="note" role="alert" style="color:#e58f8f">${esc(joinError)}</p>` : "") + `<section class="frame" style="padding:8px 18px"><div class="eyebrow" style="padding-top:12px">${esc(r.type === "bonus" ? "Bonus round" : "Round " + (ri + 1))}</div><div style="font-size:20px;margin:2px 0 8px">${esc(r.title)}</div>` +
       (qs.length ? qlineHTML(r, ri, cur, false) + (past.length ? `<div class="earlier"><p class="eh">Earlier this round</p>${past.map(qi => qlineHTML(r, ri, qi, true)).join("")}</div>` : "")
         : `<p class="note" style="padding:8px 0 14px">Waiting for the first question.</p>`) + `</section>`;
   }
@@ -1462,6 +1531,8 @@ document.addEventListener("click", e => {
   if (role !== "player") return; const t = e.target.closest("button"); if (!t) return; const d = t.dataset;
   if (d.ptab) { playerTab = d.ptab; return render(); }
   if (d.pick) { const [ri, qi, L] = d.pick.split("|"); if (t.disabled) return; sendAnswerNow(+ri, +qi, L); return render(); }
+  if (d.jokerOn !== undefined) { if (!Net.send({ t: "joker", round: +d.jokerOn, on: true })) { joinError = "Not connected. Try again."; } return render(); }
+  if (d.jokerOff !== undefined) { Net.send({ t: "joker", round: +d.jokerOff, on: false }); return render(); }
   if (d.pc) { PAD.color = d.pc; return render(); }
   if (d.pb) { PAD.bg = d.pb; return render(); }
   if (d.ps) { PAD.size = +d.ps; return render(); }

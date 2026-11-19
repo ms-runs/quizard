@@ -289,9 +289,6 @@ img.tlogo{font-size:1em;width:1.7em;height:1.7em}
 .picked{font-size:14px;color:var(--iv2);margin-left:4px}
 .qline.conn{border:1px solid var(--gold);padding:14px;margin:8px 0;background:rgba(212,175,55,.06)}
 /* TV: finished question shrinks */
-.stage .qtext{transition:font-size .5s var(--ease)}
-.stage.done .qtext{font-size:clamp(20px,2.4vw,38px);color:var(--iv2)}
-.stage.mcq.done .qtext{font-size:clamp(18px,2vw,32px)}
 /* overflow fixes */
 .big,.qtext,.ans b,.opts li span{overflow-wrap:anywhere;hyphens:auto}
 .big.long{font-size:clamp(34px,5.4vw,88px)}
@@ -374,6 +371,15 @@ img.tlogo{font-size:1em;width:1.7em;height:1.7em}
 .how.compact li span:not(.hn){display:none}
 .how.compact li{align-items:center}
 .how.compact{gap:clamp(6px,.8vw,10px)}
+
+.sugg{display:block;font-size:12px;color:#e5b45f;margin-top:4px}
+.ritem.stop{border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);color:var(--gold)}
+.ritem.stop .n svg{width:14px;height:14px}
+.introcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
+.icard{text-align:left;display:flex;flex-direction:column;gap:4px;padding:14px;border:1px solid var(--line);background:var(--bg);color:var(--ivory);cursor:pointer;min-height:88px}
+.icard b{font-weight:500}.icard span{font-size:13px;color:var(--iv3)}
+.icard.on{border-color:var(--gold);background:rgba(212,175,55,.1)}
+.icard.on b{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -430,7 +436,7 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
    state
    ===================================================================== */
 const defaultState = () => ({
-  rev: 0, quizId: "", answerMode: "each", revealMode: "review", teams: [], scores: {}, shown: -1, prevShown: -1,
+  rev: 0, quizId: "", answerMode: "each", revealMode: "review", introRules: true, teams: [], scores: {}, shown: -1, prevShown: -1,
   live: { round: -1, step: 0, view: "play", timerEnd: null, review: null }
 });
 let S = defaultState();
@@ -827,6 +833,12 @@ function reviewHTML(ri) {
     <div style="overflow-x:auto;margin-top:10px"><table class="sc arev"><thead><tr><th>Team</th>${head}</tr></thead><tbody>${rows}</tbody></table></div>
     ${bonus ? "" : `<div class="row" style="margin-top:14px"><button class="btn pri" data-act="usemarks" data-ri="${ri}">Use these marks as scores</button></div>`}</div>`;
 }
+function fillRound(ri) {
+  const r = BANK.rounds[ri]; if (!r || r.type === "bonus" || ri >= SCORED) return;
+  const todo = S.teams.filter(t => { const cur = S.scores[t.id] && S.scores[t.id][ri]; return (cur === undefined || cur === "") && ANS[t.id] && ANS[t.id][ri]; });
+  if (!todo.length) return;
+  commit(s => todo.forEach(t => { let sum = 0; r.questions.forEach((q, qi) => { sum += effMark(t.id, ri, qi); }); s.scores[t.id] = s.scores[t.id] || {}; s.scores[t.id][ri] = Math.max(r.min ?? 0, Math.min(r.max, sum)); }));
+}
 function fillMarks(ph) {
   let n = 0;
   commit(s => { reviewRounds(ph).forEach(ri => { const r = BANK.rounds[ri]; if (r.type === "bonus") return;
@@ -1029,13 +1041,23 @@ function actions() {
   return {
     start(ri) { commit(s => { s.live = { round: ri, step: 0, view: "play", timerEnd: null }; }); tab = "run"; },
     next() {
+      const L0 = S.live;
+      if (L0.view === "review" && L0.review) return this.rnext();
+      if (L0.round < 0 && S.introRules && L0.view !== "rules") return commit(s => { s.live.view = "rules"; });
+      if (S.revealMode === "review" && L0.round >= 0 && L0.view !== "scores") {
+        const c = curStep();
+        if (c && c.i === c.steps.length - 1) {
+          if (L0.round === HALF_IDX && S.shown < HALF_IDX) return this.startReview("half");
+          if (L0.round === SCORED - 1 && S.shown < SCORED - 1) return this.startReview("final");
+        }
+      }
       commit(s => {
         if (s.live.round < 0) { s.live = { round: 0, step: 0, view: "play", timerEnd: null, review: null }; return; }
         const n = buildSteps(s.live.round).length; s.live.view = "play";
         if (s.live.step < n - 1) s.live.step++; else if (S.revealMode === "review" && s.live.round < SCORED - 1) { s.live.round++; s.live.step = 0; }
       });
     },
-    back() { commit(s => { s.live.view = "play"; if (s.live.step > 0) s.live.step--; }); },
+    back() { if (S.live.view === "review" && S.live.review) return this.rback(); commit(s => { s.live.view = "play"; if (s.live.step > 0) s.live.step--; }); },
     go(i) { commit(s => { s.live.view = "play"; s.live.step = i; }); },
     reveal() {
       const c = curStep(); if (!c || c.s.t !== "q" || c.s.reveal) return;
@@ -1044,7 +1066,7 @@ function actions() {
     },
     toggleJoin() { commit(s => { s.live.view = s.live.view === "join" ? "play" : "join"; }); },
     startReview(ph) { commit(s => { s.live.view = "review"; s.live.review = { phase: ph, step: 0 }; }); },
-    rnext() { const c = reviewCur(); if (!c) return; if (c.i < c.steps.length - 1) commit(s => { s.live.review.step = c.i + 1; s.live.view = "review"; }); },
+    rnext() { const c = reviewCur(); if (!c) return; if (c.i < c.steps.length - 1) commit(s => { s.live.review.step = c.i + 1; s.live.view = "review"; }); else c.rv.phase === "half" ? this.revealHalf() : this.revealFinal(); },
     rback() { const c = reviewCur(); if (!c) return; if (c.i > 0) commit(s => { s.live.review.step = c.i - 1; s.live.view = "review"; }); },
     rgo(i) { commit(s => { s.live.review.step = i; s.live.view = "review"; }); },
     exitReview() { commit(s => { s.live.view = "play"; }); },
@@ -1056,6 +1078,7 @@ function actions() {
   };
 }
 const A = actions();
+{ const nx = A.next.bind(A); A.next = () => { nx(); const c = curStep(); if (c && c.s && c.s.t === "roundend" && S.live.round >= 0) fillRound(S.live.round); }; }
 
 function runTab() {
   const c = curStep(); const L = S.live;
@@ -1063,11 +1086,18 @@ function runTab() {
   let top = "";
   if (L.view === "review" && L.review) return reviewPanel();
   if (lobby) {
-    top = `<div class="panel"><h3>Ready when you are</h3><p class="note">The board shows the title card, how it works and the join code. Teams join from their phones.</p>
-      <div class="ctrls" style="margin-top:14px"><button class="btn pri" data-act="next">${ic("play")}Start round 1</button><button class="btn ${L.view === "rules" ? "pri" : ""}" data-act="toggleRules">${L.view === "rules" ? "Back to title card" : "Show how it works full screen"}</button><button class="btn" data-tab="teams">Teams</button></div></div>`;
+    const cards = [["play", "Title card", "Quiz name, short how-it-works and the QR code."], ["rules", "How it works", "The full instructions, large."], ["join", "Join code", "A big QR code and room code."]];
+    const cur = L.view === "rules" ? "rules" : L.view === "join" ? "join" : "play";
+    top = `<div class="panel"><h3>Before you start</h3><p class="note">Choose what the TV shows while teams arrive.</p>
+      <div class="introcards" role="radiogroup" aria-label="Intro card">${cards.map(([k, h, b]) => `<button class="icard ${cur === k ? "on" : ""}" role="radio" aria-checked="${cur === k}" data-intro="${k}"><b>${h}</b><span>${b}</span></button>`).join("")}</div>
+      <label class="row" style="min-height:44px;margin-top:12px"><input type="checkbox" data-introrules ${S.introRules ? "checked" : ""}> Show the instructions when I press Start, then round 1</label>
+      <div class="ctrls" style="margin-top:12px"><button class="btn pri" data-act="next">${ic("play")}${S.introRules && L.view !== "rules" ? "Start: show instructions" : "Start round 1"}</button><button class="btn" data-tab="teams">Teams (${S.teams.length})</button></div></div>`;
   } else {
     const r = BANK.rounds[L.round]; const s = c.s; const q = s.t === "q" ? r.questions[s.qi] : null;
     const isLast = c.i === c.steps.length - 1;
+    const rvm = S.revealMode === "review";
+    const nextAfter = !isLast || !rvm ? "" : L.view === "scores" ? (L.round < SCORED - 1 ? `Start round ${L.round + 2}` : "") : L.round === HALF_IDX && S.shown < HALF_IDX ? "Half-time answers" : L.round === SCORED - 1 && S.shown < SCORED - 1 ? "Final answers" : L.round < SCORED - 1 ? "Next round" : "";
+    if (isLast && L.round < SCORED) scoreRound = L.round;
     const canReveal = s.t === "q" && !s.reveal && c.steps.some((x, k) => k > c.i && x.t === "q" && x.qi === s.qi && x.reveal);
     const nowText = s.t === "q" ? q.q : stepLabel(r, s);
     top = `<div class="grid2">
@@ -1083,8 +1113,8 @@ function runTab() {
           <button class="btn ico" data-act="back" aria-label="Previous step" ${c.i === 0 ? "disabled" : ""}>${ic("left")}</button>
           ${canReveal ? `<button class="btn" data-act="reveal">${ic("eye")}Reveal answer</button>` : ""}
           ${s.t === "timer" ? (L.timerEnd ? `<button class="btn" data-act="timer0">Reset clock</button>` : `<button class="btn pri" data-act="timer1">Start ${fmt(s.secs)} clock</button>`) : ""}
-          <button class="btn ${canReveal ? "" : "pri"}" data-act="next" ${isLast && !(S.revealMode === "review" && L.round < SCORED - 1) ? "disabled" : ""}>${isLast && S.revealMode === "review" && L.round < SCORED - 1 ? "Next round" : "Next"}${ic("right")}</button>
-          ${isLast ? `<button class="btn pri" data-tab="score" data-sr="${L.round}">Score this round</button>` : ""}
+          <button class="btn ${canReveal ? "" : "pri"}" data-act="next" ${isLast && !nextAfter ? "disabled" : ""}>${isLast ? (nextAfter || "Next") : "Next"}${ic("right")}</button>
+          
         </div>
         <div class="kbd"><b>←</b> <b>→</b> step · <b>Space</b> reveal · <b>S</b> scores on the board</div>
       </div>
@@ -1092,7 +1122,7 @@ function runTab() {
         <div class="ctrls" style="margin-top:14px"><button class="btn ${L.view === "join" ? "pri" : ""}" data-act="toggleJoin">${ic("board")}${L.view === "join" ? "Back to the quiz" : "Show join code"}</button></div>
         <h3 style="margin-top:18px">Jump to a step</h3>
         <ul class="steplist">${c.steps.map((x, k) => `<li><button class="${k === c.i ? "cur" : k < c.i ? "done" : ""}" data-go="${k}" aria-label="${esc(stepLabel(r, x))}">${stepShort(r, x, k)}</button></li>`).join("")}</ul>
-      </div></div>`;
+      </div></div>${isLast && L.round < SCORED && S.teams.length ? scoreTabMain(true) : ""}`;
   }
   return top;
 }
@@ -1130,24 +1160,29 @@ function scoreTab() {
   const ri0 = Math.min(scoreRound, SCORED - 1);
   return `<div style="display:flex;flex-direction:column;gap:20px">${scoreTabMain()}${reviewHTML(ri0)}<div class="panel">${revealBlock()}</div></div>`;
 }
-function scoreTabMain() {
+function totalTo(t, through) { let s = 0; for (let r = 0; r <= through; r++) { const v = roundPts(t, r); if (v !== null) s += v; } return s; }
+function scoreTabMain(inline) {
   const ri = Math.min(scoreRound, SCORED - 1); const r = BANK.rounds[ri];
   const min = r.min ?? 0, max = r.max;
   const chips = BANK.rounds.slice(0, SCORED).map((x, i) => `<button class="btn sm ${i === ri ? "pri" : ""}" data-sr="${i}" aria-label="${esc(x.title)}">${x.type === "bonus" ? "Bonus" : "R" + (i + 1)}${roundComplete(i) ? " ✓" : ""}</button>`).join("");
   if (!S.teams.length) return `<div class="panel"><p class="note">Add teams first.</p><button class="btn" data-tab="teams" style="margin-top:10px">Add teams</button></div>`;
+  const anyPhone = S.teams.some(t => ANS[t.id] && ANS[t.id][ri]);
   const rows = S.teams.map(t => {
     const v = S.scores[t.id] && S.scores[t.id][ri]; const jk = t.joker === ri;
     const pts = roundPts(t, ri);
+    const sug = ANS[t.id] && ANS[t.id][ri] && r.type !== "bonus" ? r.questions.reduce((a, q, qi) => a + effMark(t.id, ri, qi), 0) : null;
     return `<tr><td><span class="tcell">${logoHTML(t)}${esc(t.name)}</span></td>
-      <td><div class="step"><button data-fk="d-${t.id}" data-dec="${t.id}" aria-label="Minus one for ${esc(t.name)}">${ic("minus")}</button><input class="num" inputmode="numeric" data-fk="s-${t.id}" data-score="${t.id}" value="${v === undefined ? "" : v}" aria-label="Points for ${esc(t.name)}"><button data-fk="i-${t.id}" data-inc="${t.id}" aria-label="Plus one for ${esc(t.name)}">${ic("plus")}</button></div></td>
+      <td><div class="step"><button data-fk="d-${t.id}" data-dec="${t.id}" aria-label="Minus one for ${esc(t.name)}">${ic("minus")}</button><input class="num" inputmode="numeric" data-fk="s-${t.id}" data-score="${t.id}" value="${v === undefined ? "" : v}" aria-label="Points for ${esc(t.name)}"><button data-fk="i-${t.id}" data-inc="${t.id}" aria-label="Plus one for ${esc(t.name)}">${ic("plus")}</button></div>${sug !== null && sug !== v ? `<small class="sugg">Phone says ${sug}</small>` : ""}</td>
       <td>${r.type === "bonus" ? "" : `<button data-fk="j-${t.id}" class="btn sm ${jk ? "pri" : ""}" data-joker="${t.id}" aria-pressed="${jk}">${jk ? "Joker played" : "Play joker"}</button>`}</td>
-      <td class="num">${pts === null ? "·" : pts}${jk && pts !== null ? ' <span class="pill">×2</span>' : ""}</td></tr>`;
+      <td class="num ca">${pts === null ? "·" : pts}${jk && pts !== null ? ' <span class="pill">×2</span>' : ""}</td>
+      <td class="num tot">${totalTo(t, ri)}</td></tr>`;
   }).join("");
-    return `<div class="panel"><div class="row" style="margin-bottom:14px">${chips}</div>
-    <h3>${esc(r.title)}</h3><p class="note">${esc(r.rule)} Points available: ${r.type === "bonus" ? `${min} to ${max}` : max}.</p>
-    <div style="overflow-x:auto;margin-top:10px"><table class="sc"><thead><tr><th>Team</th><th>Points</th><th>Joker</th><th>Counts as</th></tr></thead><tbody>${rows}</tbody></table></div>
+  return `<div class="panel">${inline ? "" : `<div class="row" style="margin-bottom:14px">${chips}</div>`}
+    <h3>${inline ? `Scores for round ${ri + 1}` : esc(r.title)}</h3><p class="note">${inline ? (anyPhone ? "Filled in from phone answers. Adjust anything you need to." : "Type each team's points.") : esc(r.rule)} Points available: ${r.type === "bonus" ? `${min} to ${max}` : max}.</p>
+    <div style="overflow-x:auto;margin-top:10px"><table class="sc"><thead><tr><th>Team</th><th>Points</th><th>Joker</th><th>Counts as</th><th>Total so far</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="row" style="margin-top:16px">
-      <span class="note">Scores save as you type. Nobody sees them until you reveal the scoreboard.</span>
+      ${anyPhone && r.type !== "bonus" ? `<button class="btn" data-act="usemarks" data-ri="${ri}">Refill all from phones</button>` : ""}
+      <span class="note">Scores save as you type and stay hidden until half-time or the end.</span>
       <span class="toast">${esc(toast)}</span></div></div>`;
 }
 function teamsTab() {
@@ -1183,9 +1218,13 @@ function settingsTab() {
 }
 function hostHTML() {
   const L = S.live;
+  const stop = (ph, label, done, on) => `<button class="ritem stop ${on ? "cur" : ""}" data-act="review" data-ph="${ph}" aria-label="${label}"><span class="n">${ic("eye")}</span><span class="t">${label}</span><span class="dot ${done ? "ok" : ""}" title="${done ? "Scores revealed" : "Planned"}"></span></button>`;
   const rail = BANK.rounds.map((r, i) => {
-    const done = roundComplete(i); const cur = L.round === i;
-    return `<button class="ritem ${cur ? "cur" : ""}" data-start="${i}" aria-label="Go to ${esc(r.title)}"><span class="n num">${r.type === "tiebreak" ? "T" : r.type === "bonus" ? "B" : i + 1}</span><span class="t">${esc(r.title)}</span><span class="dot ${done ? "ok" : ""}" title="${done ? "Scored" : "Not scored yet"}"></span></button>`;
+    const done = roundComplete(i); const cur = L.round === i && L.view !== "review";
+    let h = `<button class="ritem ${cur ? "cur" : ""}" data-start="${i}" aria-label="Go to ${esc(r.title)}"><span class="n num">${r.type === "tiebreak" ? "T" : r.type === "bonus" ? "B" : i + 1}</span><span class="t">${esc(r.title)}</span><span class="dot ${done ? "ok" : ""}" title="${done ? "Scored" : "Not scored yet"}"></span></button>`;
+    if (S.revealMode === "review" && i === HALF_IDX) h += stop("half", "Half-time: answers and scores", S.shown >= HALF_IDX, L.view === "review" && L.review && L.review.phase === "half");
+    if (S.revealMode === "review" && i === SCORED - 1) h += stop("final", "Final: answers and scores", S.shown >= SCORED - 1, L.view === "review" && L.review && L.review.phase === "final");
+    return h;
   }).join("");
   const tabs = [["run", "Run"], ["score", "Score"], ["teams", "Teams"], ["settings", "Settings"]];
   const content = tab === "run" ? runTab() : tab === "score" ? scoreTab() : tab === "teams" ? teamsTab() : settingsTab();
@@ -1210,6 +1249,7 @@ document.addEventListener("click", e => {
   if (d.tab) { tab = d.tab; if (d.sr !== undefined) scoreRound = +d.sr; return render(); }
   if (d.start !== undefined) { A.start(+d.start); return; }
   if (d.go !== undefined) return A.go(+d.go);
+  if (d.intro) { commit(s => { s.live.view = d.intro; }); return; }
   if (d.rgo !== undefined) return A.rgo(+d.rgo);
   if (d.sr !== undefined) { scoreRound = +d.sr; toast = ""; return render(); }
   if (d.inc || d.dec) { const id = d.inc || d.dec; bump(id, d.inc ? 1 : -1); return; }
@@ -1229,6 +1269,7 @@ document.addEventListener("change", e => {
   if (el.dataset.score) setScore(el.dataset.score, el.value);
   if (el.dataset.rename) commit(s => { const tm = s.teams.find(x => x.id === el.dataset.rename); if (tm && el.value.trim()) tm.name = el.value.trim().slice(0, 32); });
   if (el.name === "am") commit(s => { s.answerMode = el.value; s.live.step = 0; });
+  if (el.dataset.introrules !== undefined) commit(s => { s.introRules = el.checked; });
   if (el.name === "rm") commit(s => { s.revealMode = el.value; s.live.step = 0; });
 });
 document.addEventListener("keydown", e => {
@@ -1249,7 +1290,7 @@ function setScore(id, raw) {
   const inp = $(`[data-score="${id}"]`); if (!inp) return;
   const v = S.scores[id] && S.scores[id][ri]; inp.value = v === undefined ? "" : v;
   const tm = S.teams.find(x => x.id === id); const pts = roundPts(tm, ri); const jk = tm.joker === ri;
-  inp.closest("tr").lastElementChild.innerHTML = (pts === null ? "·" : pts) + (jk && pts !== null ? ' <span class="pill">×2</span>' : "");
+  const tr = inp.closest("tr"); tr.querySelector(".ca").innerHTML = (pts === null ? "·" : pts) + (jk && pts !== null ? ' <span class="pill">×2</span>' : ""); tr.querySelector(".tot").textContent = totalTo(tm, ri);
 }
 function bump(id, dlt) {
   const ri = Math.min(scoreRound, SCORED - 1); const cur = S.scores[id] && S.scores[id][ri];

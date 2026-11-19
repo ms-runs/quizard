@@ -20,14 +20,13 @@
       "description": "11 rounds: geography maps, Eurovision, history, 2026 music, pop culture, recent films, Pantone, flags, animal news, picture objects and a secret connection.",
       "meta": "55 multiple-choice questions + 1 secret connection bonus",
       "status": "ready"
-    },    
+    },
     {
-  "id": "birthday2026",
-  "title": "Paulina’s Birthday Pub Quiz · 2026",
-  "description": "Geography, 2000s music, science, food, 2026 news, animals, Pantone and a secret bouquet",
-  "meta": "40 questions + 1 bonus · Art Deco",
-  "status": "ready"
-  }
-    
+      "id": "birthday2026",
+      "title": "Paulina’s Birthday Pub Quiz · 2026",
+      "description": "Geography, 2000s music, science, food, 2026 news, animals, Pantone and a secret connection",
+      "meta": "40 questions + 1 bonus · Art Deco",
+      "status": "ready"
+    }
   ]
 }

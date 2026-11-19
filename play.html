@@ -990,6 +990,7 @@ function stageHTML(ri0, s0) {
   const eb = (t, d) => `<div class="eyebrow">${esc(t)}</div>${d && deco() ? '<div class="dd" aria-hidden="true"><i></i></div>' : ""}`;
   if (s.t === "intro") {
     const num = r.type === "tiebreak" ? "Tiebreaker" : r.type === "bonus" ? "Bonus" : `Round ${ri + 1}`;
+    if (r.introCard) return `<section class="frame stage">${decoTop()}<img src="${esc(r.introCard)}" alt="${esc(r.title)}: five questions and one secret connection" style="display:block;width:100%;max-height:60vh;object-fit:contain"/><p class="rule">${esc(r.rule)}</p>${jokerOK(ri) ? jokerNote(ri) || `<p class="rule jkhint">Jokers: play yours now on your phone if you want to double this round.</p>` : ""}</section>`;
     return `<section class="frame stage">${decoTop()}${eb(num, 1)}<h1 class="big ${r.title.length > 20 ? "long" : ""}">${esc(r.title)}</h1><p class="rule">${esc(r.rule)}</p>${jokerOK(ri) ? jokerNote(ri) || `<p class="rule jkhint">Jokers: play yours now on your phone if you want to double this round.</p>` : ""}</section>`;
   }
   if (s.t === "q") {
@@ -999,6 +1000,7 @@ function stageHTML(ri0, s0) {
     if (q.opts) {
       return `<section class="frame stage mcq ${s.reveal ? "done" : ""} lay-${r.layout || "std"}">${decoTop()}${eb(label)}<div class="mcqrow">${q.vis ? visHTML(q, false, r, s.reveal, s.qi) : ""}<div class="mcqtxt"><p class="qtext ${q.vis ? "" : "wide"}">${esc(q.q)}</p>${optsHTML(q, s.reveal)}</div></div></section>`;
     }
+    if (s.reveal && q.connection && q.revealCard) return `<section class="frame stage">${decoTop()}<img src="${esc(q.revealCard)}" alt="Birthday reveal: the five answers are varieties of apple" style="display:block;width:100%;max-height:68vh;object-fit:contain"/><p class="rule">Five correct answers — Fuji, Jazz, Empire, Gala and Ambrosia — are all apple varieties. Happy birthday!</p></section>`;
     const ans = s.reveal ? `<div class="ans"><small>Answer</small><b>${esc(q.a)}</b></div>` : "";
     return `<section class="frame stage ${s.reveal ? "done" : ""}">${decoTop()}${eb(label)}<p class="qtext ${r.type === "bonus" ? "wide" : ""}">${esc(q.q)}</p>${photo}${ans}</section>`;
   }

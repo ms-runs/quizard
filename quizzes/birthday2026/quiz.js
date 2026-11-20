@@ -74,17 +74,24 @@ window.QUIZ = {
           "source": "https://www.guinnessworldrecords.com/world-records/779653-most-ancient-pyramids-country"
         },
         {
-          "q": "The world’s largest salt flat, Salar de Uyuni, is in which country?",
+          "q": "FLAG CLOSE-UP: Which country's national flag contains this bird?",
           "opts": [
-            "Chile",
-            "Bolivia",
-            "Peru",
-            "Argentina"
+            "Dominica",
+            "Uganda",
+            "Papua New Guinea",
+            "Zimbabwe"
           ],
           "c": 1,
-          "a": "Bolivia",
-          "note": "The enormous high-altitude salt flat often becomes mirror-like after rain.",
-          "source": "https://www.guinnessworldrecords.com/world-records/82679-largest-salt-flat"
+          "a": "Uganda",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Flag_of_Uganda.svg",
+            "crop": {
+              "zoom": 2.7
+            },
+            "alt": "A tightly cropped emblem showing the head and crown of a bird on a national flag"
+          },
+          "note": "The central emblem of Uganda's flag contains a grey crowned crane. Cropped to conceal the black/yellow/red stripes and make the question challenging.",
+          "source": "https://commons.wikimedia.org/wiki/File:Flag_of_Uganda.svg"
         }
       ],
       "note": "Two original geographic outline maps of southern Africa and Central America, one close-up Caribbean flag excerpt, plus two surprising country facts. Medium difficulty. No home-country questions."
@@ -97,64 +104,77 @@ window.QUIZ = {
       "rule": "One point per correct answer. Optional: play a short licensed clip before each question.",
       "questions": [
         {
-          "q": "Nelly’s 2002 hit Dilemma featured which Destiny’s Child singer?",
+          "q": "Which girl group won British Single at the 2009 BRIT Awards with The Promise?",
           "opts": [
-            "Michelle Williams",
-            "Beyoncé",
-            "Kelly Rowland",
-            "LeToya Luckett"
-          ],
-          "c": 2,
-          "a": "Kelly Rowland",
-          "note": "The duet was released on Nellyville in 2002."
-        },
-        {
-          "q": "Which hip-hop duo released the 2003 party anthem Hey Ya!?",
-          "opts": [
-            "OutKast",
-            "Gnarls Barkley",
-            "The Black Eyed Peas",
-            "LMFAO"
-          ],
-          "c": 0,
-          "a": "OutKast",
-          "note": "Hey Ya! was sung by André 3000 on OutKast’s Speakerboxxx/The Love Below."
-        },
-        {
-          "q": "Mr. Brightside appeared on the 2004 debut album Hot Fuss by which band?",
-          "opts": [
-            "Franz Ferdinand",
-            "The Killers",
-            "Keane",
-            "Snow Patrol"
+            "Sugababes",
+            "Girls Aloud",
+            "The Saturdays",
+            "All Saints"
           ],
           "c": 1,
-          "a": "The Killers",
-          "note": "A famously durable noughties singalong."
+          "a": "Girls Aloud",
+          "source": "https://www.brits.co.uk/history/the-brits-2009/",
+          "note": "The Promise won British Single at the 2009 BRITs."
         },
         {
-          "q": "Which artist released the 2006 pop hit Maneater from the album Loose?",
+          "q": "Which Sugababes song plays during the office Christmas-party montage in the UK version of the 2003 film Love Actually?",
           "opts": [
-            "Shakira",
-            "Gwen Stefani",
-            "Fergie",
-            "Nelly Furtado"
+            "Round Round",
+            "Hole in the Head",
+            "Push the Button",
+            "Too Lost in You"
           ],
           "c": 3,
-          "a": "Nelly Furtado",
-          "note": "Produced with Timbaland; also on Loose was Promiscuous."
+          "a": "Too Lost in You",
+          "vis": {
+            "img": "https://imgix.bustle.com/rehost/2016/12/16/e29e3628-2208-409a-a83b-9cc90b0f40e6.png?crop=faces&fit=crop&fm=jpg&h=900&w=1200",
+            "alt": "A still from Love Actually showing a festive office party, with no song title"
+          },
+          "source": "https://www.imdb.com/title/tt0314331/alternateversions/",
+          "note": "The UK cut uses Too Lost in You for this scene. A licensed film still would be preferable; current image is hotlinked for noncommercial review."
         },
         {
-          "q": "Which 2008 Beyoncé album included Single Ladies (Put a Ring on It)?",
+          "q": "Which 2007 Britney Spears album featured both Gimme More and Piece of Me?",
           "opts": [
-            "B’Day",
-            "4",
-            "I Am... Sasha Fierce",
-            "Dangerously in Love"
+            "In the Zone",
+            "Circus",
+            "Britney",
+            "Blackout"
           ],
-          "c": 2,
-          "a": "I Am... Sasha Fierce",
-          "note": "One of 2008’s defining singles; the album’s two-disc concept included Sasha Fierce."
+          "c": 3,
+          "a": "Blackout",
+          "source": "https://www.britneyspears.com/discography/",
+          "note": "Both tracks appear on Blackout."
+        },
+        {
+          "q": "Which 2007 Rihanna album included both Umbrella and Shut Up and Drive?",
+          "opts": [
+            "A Girl Like Me",
+            "Good Girl Gone Bad",
+            "Rated R",
+            "Loud"
+          ],
+          "c": 1,
+          "a": "Good Girl Gone Bad",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Rihannalive2007.jpg/720px-Rihannalive2007.jpg",
+            "alt": "Rihanna performing live in 2007; no album artwork or album title visible"
+          },
+          "source": "https://www.officialcharts.com/artist/12203/rihanna/",
+          "note": "Umbrella and Shut Up and Drive appear on Good Girl Gone Bad. Photo of Rihanna from 2007 is CC BY 2.0."
+        },
+        {
+          "q": "Which pop-rock star co-wrote Kelly Clarkson's 2004 hit Breakaway?",
+          "opts": [
+            "Avril Lavigne",
+            "Michelle Branch",
+            "Ashlee Simpson",
+            "P!nk"
+          ],
+          "c": 0,
+          "a": "Avril Lavigne",
+          "source": "https://www.ascap.com/repertory#/ace/search/title/Breakaway",
+          "note": "Avril Lavigne co-wrote Breakaway with Bridget Benenate and Matthew Gerrard."
         }
       ],
       "note": "Strictly 2000–2009 hits. Optional music clips are NOT embedded; the quiz works without playback."
@@ -190,7 +210,12 @@ window.QUIZ = {
           "c": 3,
           "a": "Resist stomach acid and dissolve farther along the gut",
           "note": "Gastro-resistant coatings help the tablet pass through the stomach intact.",
-          "source": "https://pwds.nhs.uk/wp-content/uploads/2024/03/Pharmacy-Fundamentals-Handbook.pdf"
+          "source": "https://pwds.nhs.uk/wp-content/uploads/2024/03/Pharmacy-Fundamentals-Handbook.pdf",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Pills_in_blister_pack.jpg/960px-Pills_in_blister_pack.jpg",
+            "alt": "Blister packs of tablets, without an explanation of their coating"
+          },
+          "photoCredit": "Wikimedia Commons, CC0"
         },
         {
           "q": "SSRIs, a widely used class of antidepressants, primarily act on which neurotransmitter?",
@@ -261,7 +286,12 @@ window.QUIZ = {
           ],
           "c": 1,
           "a": "Pecorino Romano",
-          "note": "The classic combination is pasta, pecorino, pepper and starchy pasta water."
+          "note": "The classic combination is pasta, pecorino, pepper and starchy pasta water.",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Cacio_e_pepe_2024.jpg/960px-Cacio_e_pepe_2024.jpg",
+            "alt": "A plate of cacio e pepe pasta without the cheese packaging"
+          },
+          "photoCredit": "Wikimedia Commons, Markx89, CC BY-SA 4.0"
         },
         {
           "q": "In Japanese cooking, yuzu is a fragrant type of what?",
@@ -297,7 +327,12 @@ window.QUIZ = {
           ],
           "c": 3,
           "a": "Gin",
-          "note": "Traditionally made in equal parts with orange garnish."
+          "note": "Traditionally made in equal parts with orange garnish.",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Negroni.jpg/600px-Negroni.jpg",
+            "alt": "Negroni cocktail in a glass, without ingredient labels"
+          },
+          "photoCredit": "Wikimedia Commons, Chris Palmer, CC BY-SA"
         }
       ],
       "note": "Five accessible foodie questions from varied cuisines, with no home-country-specific answers."
@@ -333,7 +368,12 @@ window.QUIZ = {
           "c": 1,
           "a": "Artemis II",
           "note": "Four astronauts completed a roughly ten-day lunar flyby and returned safely.",
-          "source": "https://www.nasa.gov/news-release/nasa-welcomes-record-setting-artemis-ii-moonfarers-back-to-earth/"
+          "source": "https://www.nasa.gov/news-release/nasa-welcomes-record-setting-artemis-ii-moonfarers-back-to-earth/",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Moon_Dedal_crater-crop.jpg/960px-Moon_Dedal_crater-crop.jpg",
+            "alt": "Moon crater photograph without mission labels or spacecraft"
+          },
+          "photoCredit": "NASA, public domain"
         },
         {
           "q": "Which country won the men’s FIFA World Cup in 2026?",
@@ -346,7 +386,12 @@ window.QUIZ = {
           "c": 3,
           "a": "Spain",
           "note": "Spain beat Argentina 1–0 after extra time in the final, according to FIFA.",
-          "source": "https://www.fifa.com/en/articles/final-tournament-standings"
+          "source": "https://www.fifa.com/en/articles/final-tournament-standings",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/c/ce/FIFA_World_Cup_Trophy_photo_by_Djuradj_Vujcic.jpg",
+            "alt": "FIFA World Cup trophy displayed without team names or national flags"
+          },
+          "photoCredit": "Wikimedia Commons, Djuradj Vujcic, CC BY 2.0"
         },
         {
           "q": "Which animated film won Best Animated Feature at the 2026 Academy Awards?",
@@ -362,17 +407,17 @@ window.QUIZ = {
           "source": "https://www.oscars.org/oscars/ceremonies/2026"
         },
         {
-          "q": "Who won Album of the Year at the 2026 Grammy Awards for DeBÍ TiRAR MáS FOToS?",
+          "q": "Which British singer won Best Pop Solo Performance at the 2026 Grammy Awards?",
           "opts": [
-            "Bad Bunny",
-            "Lady Gaga",
-            "Kendrick Lamar",
-            "Sabrina Carpenter"
+            "RAYE",
+            "Lola Young",
+            "Olivia Dean",
+            "PinkPantheress"
           ],
-          "c": 0,
-          "a": "Bad Bunny",
-          "note": "A landmark win for Bad Bunny.",
-          "source": "https://www.grammy.com/awards/68th-annual-grammy-awards-2025/"
+          "c": 1,
+          "a": "Lola Young",
+          "note": "Winner for the song Messy; the song name is deliberately omitted from the question.",
+          "source": "https://www.grammy.com/awards/categories/best-pop-solo-performance/"
         }
       ],
       "note": "Culture and news: Eurovision, exploration, sport, film and music. Sources checked for November 2026."
@@ -395,7 +440,12 @@ window.QUIZ = {
           "c": 1,
           "a": "Orangutan",
           "note": "Staff at Ichikawa City Zoo chose an IKEA orangutan toy for Punch.",
-          "source": "https://www.reuters.com/world/asia-pacific/abandoned-baby-monkey-finds-comfort-stuffed-orangutan-charming-zoo-visitors-2026-02-20/"
+          "source": "https://www.reuters.com/world/asia-pacific/abandoned-baby-monkey-finds-comfort-stuffed-orangutan-charming-zoo-visitors-2026-02-20/",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Macaca_fuscata_juvenile_yawning.jpg/960px-Macaca_fuscata_juvenile_yawning.jpg",
+            "alt": "An illustrative photo of a young Japanese macaque, not Punch"
+          },
+          "photoCredit": "Wikimedia Commons, Daisuke Tashiro, CC license"
         },
         {
           "q": "In 2024, Dudley Zoo keepers made a homemade baby bouncer to help Flop recover. What animal is Flop?",
@@ -447,7 +497,12 @@ window.QUIZ = {
           "c": 1,
           "a": "A car engine",
           "note": "The cubs were found huddled together inside a car’s engine bay in North Ayrshire.",
-          "source": "https://www.scottishspca.org/news/scottish-spcas-wildlife-rescue-centre-caring-for-unusual-amount-of-otters-this-world-wildlife-day/"
+          "source": "https://www.scottishspca.org/news/scottish-spcas-wildlife-rescue-centre-caring-for-unusual-amount-of-otters-this-world-wildlife-day/",
+          "vis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Eurasian_otter.4.JPG/960px-Eurasian_otter.4.JPG",
+            "alt": "An illustrative photograph of a Eurasian otter, not the individual rescued animals"
+          },
+          "photoCredit": "Wikimedia Commons, Erik Christensen, CC BY-SA 4.0"
         }
       ],
       "note": "Five heartwarming stories from 2024–2026. No repeat of Samba, Neukgu, Greek tiger cubs, Ghanaian froglets or Merlin the duck used in the prior 2026 quiz."

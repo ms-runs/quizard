@@ -1361,7 +1361,7 @@ document.addEventListener("keydown", e => {
   if (role !== "host") return;
   const typing = /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
   if (e.target.id === "newteam" && e.key === "Enter") return addTeam();
-  if (typing || tab !== "run" || e.metaKey || e.ctrlKey) return;
+  if (typing || tab !== "run" || e.metaKey || e.ctrlKey || ["intro", "rules", "join"].includes(S.live.view) && S.live.round >= 0) return;
   const inReview = S.live.view === "review" && S.live.review;
   if (e.key === "ArrowRight") { e.preventDefault(); inReview ? A.rnext() : A.next(); }
   else if (e.key === "ArrowLeft") { e.preventDefault(); inReview ? A.rback() : A.back(); }

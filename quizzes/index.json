@@ -27,6 +27,13 @@
       "description": "Geography, 2000s music, science, food, 2026 news, animals, Pantone and a secret connection",
       "meta": "40 questions + 1 bonus · Art Deco",
       "status": "ready"
+    },
+    {
+      "id": "there-aint-no-way",
+      "title": "There Ain't No Way",
+      "description": "Eight rounds of hard, hilarious true facts from history, geography, culture, food, wildlife, sport and the world's strangest inventions. Every answer comes with a 'no way' explanation.",
+      "meta": "40 questions · 8 rounds · Art Deco · backup quiz",
+      "status": "ready"
     }
   ]
 }

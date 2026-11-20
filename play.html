@@ -373,6 +373,8 @@ img.tlogo{font-size:1em;width:1.7em;height:1.7em}
 .how.compact{gap:clamp(6px,.8vw,10px)}
 
 .sugg{display:block;font-size:12px;color:#e5b45f;margin-top:4px}
+.ritem.intro-link{border-bottom:1px solid var(--line);margin-bottom:8px;color:var(--gold)}
+.ritem.intro-link .n svg{width:15px;height:15px}
 .ritem.stop{border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);color:var(--gold)}
 .ritem.stop .n svg{width:14px;height:14px}
 .introcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}
@@ -479,6 +481,7 @@ let role = "board";       // "host" | "board" | "player"
 let lastScrollK = "", PNAME = "", PAD = { strokes: [], color: "#F2EDDC", size: 8, bg: "#1F2A5A" }, padOpen = false, logoSkip = false;
 let ANS = {}, MARKS = {}, me = null, MY = {}, ST = {}, playerTab = "sheet", joinError = "", joining = false, prevView = "play";
 let tab = "run";
+let introReturnView = null; // host-local navigation bookmark; never resets quiz progress
 let scoreRound = 0;
 let confirmReset = false;
 let toast = "";
@@ -1067,10 +1070,11 @@ function animateRows() {
 }
 function renderBoard() {
   const L = S.live;
-  let scene = L.view === "scores" ? "scores" : L.view === "join" ? "join" : L.view === "review" && L.review ? "review" : L.view === "rules" ? "rules" : L.round < 0 ? "lobby" : "play";
+  let scene = L.view === "scores" ? "scores" : L.view === "join" ? "join" : L.view === "review" && L.review ? "review" : L.view === "rules" ? "rules" : L.view === "intro" ? "intro" : L.round < 0 ? "lobby" : "play";
   let body = "";
   if (scene === "scores") body = `<div class="bbody">${standingsScene()}</div>`;
   else if (scene === "review") body = `<div class="bbody">${reviewStage()}</div>`;
+  else if (scene === "intro") body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="lobby"><div class="lobl"><div class="eyebrow">Tonight</div><h1 class="big ${BANK.title.length > 16 ? "long" : ""}">${esc(BANK.title)}</h1><p class="rule">${esc(BANK.intro || "")}</p><div class="howwrap"><div class="eyebrow" style="margin-bottom:8px">How it works</div>${howItWorks(true)}</div></div><div class="lobr">${joinPanel()}${S.teams.length ? `<div class="lobbyteams">${S.teams.map(t => `<div class="lt">${logoHTML(t, "lg")}<span>${esc(t.name)}</span></div>`).join("")}</div>` : `<p class="rule">Teams appear here as they join.</p>`}</div></div></section></div>`;
   else if (scene === "rules") body = `<div class="bbody"><section class="frame stage rulesc">${decoTop()}<div class="rgrid"><div><div class="eyebrow" style="margin-bottom:14px">How it works</div>${howItWorks()}</div><div><div class="eyebrow" style="margin-bottom:14px">Tonight's rounds</div>${roundsList(true)}</div></div></section></div>`;
   else if (scene === "join") body = `<div class="bbody"><section class="frame stage">${decoTop()}<div class="eyebrow">Join the quiz</div><h1 class="big">Scan to join</h1>${joinPanel()}</section></div>`;
   else if (scene === "lobby") {
@@ -1079,7 +1083,7 @@ function renderBoard() {
     const side = "";
     body = `<div class="bbody ${side ? "split" : ""}">${stageHTML()}${side}</div>`;
   }
-  setApp(`<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : scene === "rules" ? "How it works · Tonight's rounds" : scene === "review" ? phaseName(L.review.phase) : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`);
+  setApp(`<div class="board"><header class="bhead"><div class="mark">${esc(BANK.title)}</div><div class="crumb">${esc(scene === "scores" ? "Scores" : scene === "join" ? "Join" : scene === "rules" ? "How it works · Tonight's rounds" : scene === "intro" || scene === "lobby" ? "Introduction" : scene === "review" ? phaseName(L.review.phase) : crumb())}</div></header>${body}${deco() ? SKY : ""}<div class="sr" role="status">${esc(netText())}</div></div>`);
   tickClock();
   if (scene === "scores" && (boardLast.scene !== "scores" || boardLast.shown !== S.shown)) animateRows();
   boardLast = { scene, shown: S.shown };
@@ -1110,7 +1114,10 @@ function curStep() {
 function actions() {
   const L = S.live;
   return {
-    start(ri) { commit(s => { s.live = { round: ri, step: 0, view: "play", timerEnd: null }; }); tab = "run"; },
+    start(ri) { introReturnView = null; commit(s => { s.live = { round: ri, step: 0, view: "play", timerEnd: null }; }); tab = "run"; },
+    openIntro() { const v = S.live.view; if (v !== "intro" && v !== "rules" && v !== "join") introReturnView = v; commit(s => { s.live.view = "intro"; }); tab = "run"; },
+    introCard(which) { if (!["intro","rules","join"].includes(which)) return; commit(s => { s.live.view = which; }); tab = "run"; },
+    resumeIntro() { const returning = introReturnView || (S.live.round < 0 ? "play" : "play"); introReturnView = null; commit(s => { s.live.view = returning; }); tab = "run"; },
     next() {
       const L0 = S.live;
       if (L0.view === "review" && L0.review) return this.rnext();
@@ -1155,6 +1162,10 @@ function runTab() {
   const c = curStep(); const L = S.live;
   const lobby = L.round < 0;
   let top = "";
+  if (["intro","rules","join"].includes(L.view) && L.round >= 0) {
+    const cards = [["intro", "Title card", "Quiz introduction, team list and joining QR code."], ["rules", "Instructions and rounds", "How it works and tonight's rounds."], ["join", "Join code", "Large QR code and room code."]];
+    return `<div class="panel"><h3>Introduction</h3><p class="note">Display an opening screen without restarting the quiz. Your current round, step and scores are preserved.</p><div class="introcards">${cards.map(([k,h,b]) => `<button class="icard ${L.view === k ? "on" : ""}" data-intro="${k}" aria-pressed="${L.view === k}"><b>${h}</b><span>${b}</span></button>`).join("")}</div><div class="ctrls" style="margin-top:16px"><button class="btn pri" data-act="resumeIntro">${ic("right")}Return to quiz</button></div></div>`;
+  }
   if (L.view === "review" && L.review) return reviewPanel();
   if (lobby) {
     const cards = [["play", "Title card", "Quiz name, short how-it-works and the QR code."], ["rules", "Instructions and rounds", "How it works, plus every round name so teams can plan their joker."], ["join", "Join code", "A big QR code and room code."]];
@@ -1291,8 +1302,10 @@ function settingsTab() {
 function hostHTML() {
   const L = S.live;
   const stop = (ph, label, done, on) => `<button class="ritem stop ${on ? "cur" : ""}" data-act="review" data-ph="${ph}" aria-label="${label}"><span class="n">${ic("eye")}</span><span class="t">${label}</span><span class="dot ${done ? "ok" : ""}" title="${done ? "Scores revealed" : "Planned"}"></span></button>`;
-  const rail = BANK.rounds.map((r, i) => {
-    const done = roundComplete(i); const cur = L.round === i && L.view !== "review";
+  const introActive = L.round < 0 || ["intro","rules","join"].includes(L.view);
+  const introItem = `<button class="ritem intro-link ${introActive ? "cur" : ""}" data-act="openIntro" aria-label="Go to introduction" aria-current="${introActive ? "page" : "false"}"><span class="n">${ic("play")}</span><span class="t">Introduction</span><span class="dot ${introActive ? "ok" : ""}"></span></button>`;
+  const rail = introItem + BANK.rounds.map((r, i) => {
+    const done = roundComplete(i); const cur = L.round === i && !introActive && L.view !== "review";
     let h = `<button class="ritem ${cur ? "cur" : ""}" data-start="${i}" aria-label="Go to ${esc(r.title)}"><span class="n num">${r.type === "tiebreak" ? "T" : r.type === "bonus" ? "B" : i + 1}</span><span class="t">${esc(r.title)}</span><span class="dot ${done ? "ok" : ""}" title="${done ? "Scored" : "Not scored yet"}"></span></button>`;
     if (S.revealMode === "review" && i === HALF_IDX) h += stop("half", "Half-time: answers and scores", S.shown >= HALF_IDX, L.view === "review" && L.review && L.review.phase === "half");
     if (S.revealMode === "review" && i === SCORED - 1) h += stop("final", "Final: answers and scores", S.shown >= SCORED - 1, L.view === "review" && L.review && L.review.phase === "final");
@@ -1317,11 +1330,11 @@ document.addEventListener("click", e => {
   if (role !== "host") return;
   const t = e.target.closest("button"); if (!t) return;
   const d = t.dataset;
-  if (d.act) { if (d.act === "next") A.next(); else if (d.act === "back") A.back(); else if (d.act === "reveal") A.reveal(); else if (d.act === "toggleScores") A.toggleScores(); else if (d.act === "revealHalf") A.revealHalf(); else if (d.act === "rnext") A.rnext(); else if (d.act === "rback") A.rback(); else if (d.act === "exitReview") A.exitReview(); else if (d.act === "toggleRules") A.toggleRules(); else if (d.act === "review") A.startReview(d.ph); else if (d.act === "fillmarks") fillMarks(d.ph); else if (d.act === "revealFinal") A.revealFinal(); else if (d.act === "toggleJoin") A.toggleJoin(); else if (d.act === "usemarks") useMarks(+d.ri); else if (d.act === "timer1") A.timer(true); else if (d.act === "timer0") A.timer(false); else if (d.act === "newroom") { code = newCode(); saveHost(); Net.host(code); render(); } return; }
+  if (d.act) { if (d.act === "next") A.next(); else if (d.act === "openIntro") A.openIntro(); else if (d.act === "resumeIntro") A.resumeIntro(); else if (d.act === "back") A.back(); else if (d.act === "reveal") A.reveal(); else if (d.act === "toggleScores") A.toggleScores(); else if (d.act === "revealHalf") A.revealHalf(); else if (d.act === "rnext") A.rnext(); else if (d.act === "rback") A.rback(); else if (d.act === "exitReview") A.exitReview(); else if (d.act === "toggleRules") A.toggleRules(); else if (d.act === "review") A.startReview(d.ph); else if (d.act === "fillmarks") fillMarks(d.ph); else if (d.act === "revealFinal") A.revealFinal(); else if (d.act === "toggleJoin") A.toggleJoin(); else if (d.act === "usemarks") useMarks(+d.ri); else if (d.act === "timer1") A.timer(true); else if (d.act === "timer0") A.timer(false); else if (d.act === "newroom") { code = newCode(); saveHost(); Net.host(code); render(); } return; }
   if (d.tab) { tab = d.tab; if (d.sr !== undefined) scoreRound = +d.sr; return render(); }
   if (d.start !== undefined) { A.start(+d.start); return; }
   if (d.go !== undefined) return A.go(+d.go);
-  if (d.intro) { commit(s => { s.live.view = d.intro; }); return; }
+  if (d.intro) { if (S.live.round >= 0) A.introCard(d.intro); else commit(s => { s.live.view = d.intro; }); return; }
   if (d.rgo !== undefined) return A.rgo(+d.rgo);
   if (d.sr !== undefined) { scoreRound = +d.sr; toast = ""; return render(); }
   if (d.inc || d.dec) { const id = d.inc || d.dec; bump(id, d.inc ? 1 : -1); return; }

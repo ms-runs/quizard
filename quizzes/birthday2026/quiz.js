@@ -441,11 +441,12 @@ window.QUIZ = {
           "a": "Orangutan",
           "note": "Staff at Ichikawa City Zoo chose an IKEA orangutan toy for Punch.",
           "source": "https://www.reuters.com/world/asia-pacific/abandoned-baby-monkey-finds-comfort-stuffed-orangutan-charming-zoo-visitors-2026-02-20/",
-          "vis": {
+          "answerVis": {
             "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Macaca_fuscata_juvenile_yawning.jpg/960px-Macaca_fuscata_juvenile_yawning.jpg",
-            "alt": "An illustrative photo of a young Japanese macaque, not Punch"
+            "alt": "Young Japanese macaque yawning; illustrative photo, not Punch",
+            "caption": "Japanese macaque · illustrative photo (not Punch)"
           },
-          "photoCredit": "Wikimedia Commons, Daisuke Tashiro, CC license"
+          "answerPhotoCredit": "Daisuke Tashiro · CC BY-SA 2.0 · https://commons.wikimedia.org/wiki/File:Macaca_fuscata_juvenile_yawning.jpg"
         },
         {
           "q": "In 2024, Dudley Zoo keepers made a homemade baby bouncer to help Flop recover. What animal is Flop?",
@@ -458,7 +459,13 @@ window.QUIZ = {
           "c": 2,
           "a": "Penguin",
           "note": "Flop is a Humboldt penguin who learned to stand and waddle again.",
-          "source": "https://www.itv.com/news/central/2024-11-28/flop-the-penguin-finds-her-waddle-again-thanks-to-help-from-baby-bouncer"
+          "source": "https://www.itv.com/news/central/2024-11-28/flop-the-penguin-finds-her-waddle-again-thanks-to-help-from-baby-bouncer",
+          "answerVis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/HumboldtPenguins.jpg/960px-HumboldtPenguins.jpg",
+            "alt": "Humboldt penguin standing outdoors; illustrative photo, not Flop",
+            "caption": "Humboldt penguin · illustrative photo (not Flop)"
+          },
+          "answerPhotoCredit": "Polinova · CC BY-SA 4.0 · https://commons.wikimedia.org/wiki/File:HumboldtPenguins.jpg"
         },
         {
           "q": "In Australia in 2025, joey Myka was reunited with her mother Jody after rescue. What animals are they?",
@@ -471,7 +478,13 @@ window.QUIZ = {
           "c": 0,
           "a": "Koalas",
           "note": "The two koalas received care and later joined a conservation breeding programme.",
-          "source": "https://koalaconservationaustralia.org.au/blogs/news/rescued-koalas-jody-and-myka-accepted-into-world-first-koala-breeding-program"
+          "source": "https://koalaconservationaustralia.org.au/blogs/news/rescued-koalas-jody-and-myka-accepted-into-world-first-koala-breeding-program",
+          "answerVis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Koala_and_joey.jpg/960px-Koala_and_joey.jpg",
+            "alt": "A koala with a joey on its back; illustrative photo, not Jody and Myka",
+            "caption": "Koala and joey · illustrative photo (not Jody and Myka)"
+          },
+          "answerPhotoCredit": "Benjamint444 · CC BY-SA 3.0 · https://commons.wikimedia.org/wiki/File:Koala_and_joey.jpg"
         },
         {
           "q": "In November 2026, a new baby pygmy hippo made internet favourite Moo Deng an aunt. In which country was the calf born?",
@@ -484,7 +497,13 @@ window.QUIZ = {
           "c": 3,
           "a": "Thailand",
           "note": "The calf arrived at Khao Kheow Open Zoo, Thailand, on 4 November.",
-          "source": "https://thepattayanews.com/2026/11/19/khao-kheow-open-zoo-reveals-new-pygmy-hippo-calf-is-female-announces-contest-winners/"
+          "source": "https://thepattayanews.com/2026/11/19/khao-kheow-open-zoo-reveals-new-pygmy-hippo-calf-is-female-announces-contest-winners/",
+          "answerVis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Pygmy_Hippo_Mom_and_Calf_Mars_and_Posie.jpg/960px-Pygmy_Hippo_Mom_and_Calf_Mars_and_Posie.jpg",
+            "alt": "A pygmy hippopotamus mother and calf; illustrative photo, not Moo Deng's niece",
+            "caption": "Pygmy hippo mother and calf · illustrative photo"
+          },
+          "answerPhotoCredit": "Lschmidttwp · CC BY-SA 4.0 · https://commons.wikimedia.org/wiki/File:Pygmy_Hippo_Mom_and_Calf_Mars_and_Posie.jpg"
         },
         {
           "q": "In Scotland in February 2026, two young otters were rescued after sheltering inside what?",
@@ -498,14 +517,15 @@ window.QUIZ = {
           "a": "A car engine",
           "note": "The cubs were found huddled together inside a car’s engine bay in North Ayrshire.",
           "source": "https://www.scottishspca.org/news/scottish-spcas-wildlife-rescue-centre-caring-for-unusual-amount-of-otters-this-world-wildlife-day/",
-          "vis": {
-            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Eurasian_otter.4.JPG/960px-Eurasian_otter.4.JPG",
-            "alt": "An illustrative photograph of a Eurasian otter, not the individual rescued animals"
+          "answerVis": {
+            "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Saukko_Korkeasaari_2.jpg/960px-Saukko_Korkeasaari_2.jpg",
+            "alt": "Two Eurasian otters standing together; illustrative photo, not the Scottish rescued cubs",
+            "caption": "Two Eurasian otters · illustrative photo"
           },
-          "photoCredit": "Wikimedia Commons, Erik Christensen, CC BY-SA 4.0"
+          "answerPhotoCredit": "Kallerna · Public domain · https://commons.wikimedia.org/wiki/File:Saukko_Korkeasaari_2.jpg"
         }
       ],
-      "note": "Five heartwarming stories from 2024–2026. No repeat of Samba, Neukgu, Greek tiger cubs, Ghanaian froglets or Merlin the duck used in the prior 2026 quiz."
+      "note": "Five heartwarming stories from 2024–2026. No repeat of Samba, Neukgu, Greek tiger cubs, Ghanaian froglets or Merlin the duck used in the prior 2026 quiz. Photos are shown on answer reveal only; they are representative licensed wildlife images, not the named individuals."
     },
     {
       "id": "colour",

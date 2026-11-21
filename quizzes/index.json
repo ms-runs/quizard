@@ -34,6 +34,13 @@
       "description": "Eight rounds of hard, hilarious true facts from history, geography, culture, food, wildlife, sport and the world's strangest inventions. Every answer comes with a 'no way' explanation.",
       "meta": "40 questions · 8 rounds · Art Deco · backup quiz",
       "status": "ready"
+    },
+    {
+      "id": "fur-feathers-far-fetched",
+      "title": "Fur, Feathers & Far-Fetched",
+      "description": "A playful, challenging picture-led quiz: cats, dogs, strange objects, geography, sport, British wildlife, difficult logos, rare birds, flags, macro mysteries, lyrics and a secret connection.",
+      "meta": "12 rounds · 60 questions + 1 secret bonus · 30 images",
+      "status": "ready"
     }
   ]
 }

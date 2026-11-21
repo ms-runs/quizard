@@ -132,9 +132,9 @@ window.QUIZ = {
           "c": 0,
           "a": "A chatelaine",
           "note": "A chatelaine hung from clothing or a belt and held useful items such as keys, scissors and thimbles.",
-          "source": "https://www.vam.ac.uk/articles/fashioned-from-nature",
+          "source": "https://commons.wikimedia.org/wiki/File:Needlework_Chatelaine.jpg",
           "vis": {
-            "img": "https://commons.wikimedia.org/wiki/Special:FilePath/Chatelaine.jpg?width=1000",
+            "img": "https://commons.wikimedia.org/wiki/Special:FilePath/Needlework_Chatelaine.jpg?width=1000",
             "alt": "Mystery image — identify from the picture"
           }
         },
@@ -794,7 +794,7 @@ window.QUIZ = {
             "img": "https://flagcdn.com/w640/bt.png",
             "alt": "Cropped national flag to identify",
             "crop": {
-              "zoom": 2.35
+              "zoom": 1.45
             }
           }
         },
@@ -814,7 +814,7 @@ window.QUIZ = {
             "img": "https://flagcdn.com/w640/dm.png",
             "alt": "Cropped national flag to identify",
             "crop": {
-              "zoom": 2.35
+              "zoom": 1.55
             }
           }
         },
@@ -834,7 +834,7 @@ window.QUIZ = {
             "img": "https://flagcdn.com/w640/mz.png",
             "alt": "Cropped national flag to identify",
             "crop": {
-              "zoom": 2.35
+              "zoom": 1.12
             }
           }
         },
@@ -854,7 +854,7 @@ window.QUIZ = {
             "img": "https://flagcdn.com/w640/ki.png",
             "alt": "Cropped national flag to identify",
             "crop": {
-              "zoom": 2.35
+              "zoom": 1.35
             }
           }
         },
@@ -874,7 +874,7 @@ window.QUIZ = {
             "img": "https://flagcdn.com/w640/ug.png",
             "alt": "Cropped national flag to identify",
             "crop": {
-              "zoom": 2.35
+              "zoom": 1.5
             }
           }
         }
@@ -1076,7 +1076,10 @@ window.QUIZ = {
             "headwear"
           ],
           "connection": true,
-          "note": "Fedora, Panama, Bowler, Trilby and Derby are all names of hats. Derby is the US name for a bowler hat."
+          "note": "Fedora, Panama, Bowler, Trilby and Derby are all names of hats. Derby is the US name for a bowler hat.",
+          "revealCard": "quizzes/fur-feathers-far-fetched/cards/12_hat_reveal.svg",
+          "revealAlt": "Secret answer reveal: Fedora, Panama, Bowler, Trilby and Derby are all styles of hat",
+          "revealText": "They are all hats! Fedora, Panama, Bowler, Trilby and Derby. Derby is the American name for a bowler hat."
         }
       ],
       "forceMode": "end"

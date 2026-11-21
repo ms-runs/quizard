@@ -5,7 +5,7 @@ This quiz uses twenty-five image references from Wikimedia Commons and five nati
 | Round | Q | Subject | Image and licence metadata |
 |---|---|---|---|
 | 2 | 1 | Picture This: Museum of Strange Things | [Wikimedia Commons file page](https://commons.wikimedia.org/wiki/File:Roman_dodecahedron.jpg) |
-| 2 | 2 | Picture This: Museum of Strange Things | [Wikimedia Commons file page](https://commons.wikimedia.org/wiki/File:Spherical_astrolabe.jpg) |
+| 2 | 2 | Picture This: Museum of Strange Things | [Wikimedia Commons file page](https://commons.wikimedia.org/wiki/File:Spherical_astrolabe_2.jpg) |
 | 2 | 3 | Picture This: Museum of Strange Things | [Wikimedia Commons file page](https://commons.wikimedia.org/wiki/File:Needlework_Chatelaine.jpg) |
 | 2 | 4 | Picture This: Museum of Strange Things | [Wikimedia Commons file page](https://commons.wikimedia.org/wiki/File:Armillary_sphere.jpg) |
 | 2 | 5 | Picture This: Museum of Strange Things | [Wikimedia Commons file page](https://commons.wikimedia.org/wiki/File:Butter_churn.jpg) |

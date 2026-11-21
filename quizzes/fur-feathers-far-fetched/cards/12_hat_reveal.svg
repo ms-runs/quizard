@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Secret connection reveal: all five answers are styles of hats">
+<defs><pattern id="lines" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M0 44L44 0" stroke="#CBA954" stroke-opacity=".075" stroke-width="1"/></pattern><linearGradient id="gold" x1="0" x2="1"><stop stop-color="#B8893C"/><stop offset=".5" stop-color="#EFDA96"/><stop offset="1" stop-color="#B8893C"/></linearGradient></defs>
+<rect width="1600" height="900" fill="#090D26"/><rect width="1600" height="900" fill="url(#lines)"/>
+<rect x="32" y="32" width="1536" height="836" fill="none" stroke="#BD9C53" stroke-width="3"/>
+<rect x="49" y="49" width="1502" height="802" fill="none" stroke="#BD9C53" stroke-opacity=".5" stroke-width="1"/>
+<g stroke="#BD9C53" stroke-width="3" fill="none" opacity=".65"><path d="M32 125V32H125 M1475 32h93v93 M32 775v93h93 M1475 868h93v-93"/><path d="M510 107h580m-580 686h580"/></g>
+<text x="800" y="168" font-size="28" letter-spacing="9" fill="#D9BB78" text-anchor="middle" font-family="Georgia,serif">THE SECRET CONNECTION</text>
+<text x="800" y="293" font-family="Georgia,serif" font-size="94" fill="#F4EDDB" text-anchor="middle">THERE'S NO WAY...</text>
+<text x="800" y="405" font-family="Georgia,serif" font-weight="bold" font-size="111" fill="url(#gold)" text-anchor="middle">THEY'RE ALL HATS!</text>
+<text x="800" y="470" font-family="Arial,sans-serif" font-size="30" letter-spacing="6" fill="#E9D8A9" text-anchor="middle">FEDORA   ·   PANAMA   ·   BOWLER   ·   TRILBY   ·   DERBY</text>
+<g stroke="#E0BF75" stroke-width="7" fill="#121A39" stroke-linecap="round" stroke-linejoin="round">
+<g transform="translate(170,566)"><path d="M40 126Q142 149 243 126Q220 107 187 111L178 40Q157 -3 111 13L97 95Q68 100 40 126Z"/><path d="M101 89q43 12 80-3" stroke-width="13" stroke="#BA8D42"/></g>
+<g transform="translate(470,566)"><path d="M34 127Q136 150 238 127Q206 113 180 111L170 32Q151 5 128 8Q92 8 81 42L73 110Q52 115 34 127Z"/><path d="M78 100q49 17 101 0" stroke-width="13" stroke="#BA8D42"/></g>
+<g transform="translate(770,570)"><path d="M19 122Q142 146 261 122L210 110Q211 21 141 9Q67 10 67 107Z"/><path d="M72 111q73 15 137-1" stroke-width="13" stroke="#BA8D42"/></g>
+<g transform="translate(1100,566)"><path d="M27 132Q144 153 254 124L182 115L176 33Q154 4 108 21Q88 36 79 112Z"/><path d="M81 102q42 16 99 0" stroke-width="13" stroke="#BA8D42"/></g>
+</g>
+<text x="800" y="805" text-anchor="middle" font-family="Arial,sans-serif" font-size="25" letter-spacing="5" fill="#CFBC8B">FIVE UNRELATED QUESTIONS. ONE VERY WELL-DRESSED ANSWER.</text>
+</svg>

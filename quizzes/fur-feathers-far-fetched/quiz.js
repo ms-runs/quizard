@@ -119,7 +119,7 @@ window.QUIZ = {
           "note": "An astrolabe models the apparent movement of the heavens and was used in astronomy and navigation.",
           "source": "https://www.britannica.com/science/astrolabe",
           "vis": {
-            "img": "https://commons.wikimedia.org/wiki/Special:FilePath/Spherical%20astrolabe.jpg?width=1000",
+            "img": "https://commons.wikimedia.org/wiki/Special:FilePath/Spherical_astrolabe_2.jpg?width=960",
             "alt": "Mystery image — identify from the picture"
           }
         },
@@ -877,22 +877,22 @@ window.QUIZ = {
           }
         },
         {
-          "q": "Which country's flag shows a grey crowned crane standing on one leg?",
+          "q": "Which country's flag shows two figures beside a mahogany tree?",
           "opts": [
-            "Uganda",
-            "Zambia",
-            "Kenya",
-            "Botswana"
+            "Belize",
+            "Haiti",
+            "Guatemala",
+            "El Salvador"
           ],
           "c": 0,
-          "a": "Uganda",
-          "note": "Uganda's flag features a grey crowned crane, a national emblem.",
-          "source": "https://www.britannica.com/topic/flag-of-Uganda",
+          "a": "Belize",
+          "note": "Belize's flag displays two woodcutters flanking a shield with a mahogany tree above, reflecting the country's historic timber industry.",
+          "source": "https://www.bnlsis.org/nationalsymbolsofbelize",
           "vis": {
-            "img": "https://flagcdn.com/w640/ug.png",
+            "img": "https://flagcdn.com/w640/bz.png",
             "alt": "Cropped national flag to identify",
             "crop": {
-              "zoom": 1.5
+              "zoom": 1.45
             }
           }
         }

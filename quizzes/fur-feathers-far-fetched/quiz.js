@@ -78,7 +78,9 @@ window.QUIZ = {
           "note": "The Ernest Hemingway Home & Museum is in Key West, Florida, and is home to many polydactyl cats.",
           "source": "https://www.hemingwayhome.com/cats"
         }
-      ]
+      ],
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "objects",
@@ -173,7 +175,9 @@ window.QUIZ = {
           }
         }
       ],
-      "layout": "gallery"
+      "layout": "gallery",
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "sport",
@@ -247,7 +251,9 @@ window.QUIZ = {
           "note": "He was first into the stadium but had travelled part of the route by car and was disqualified.",
           "source": "https://olympics.com/ioc/news/the-strange-case-of-the-st-louis-1904-marathon"
         }
-      ]
+      ],
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "britishwild",
@@ -321,7 +327,9 @@ window.QUIZ = {
           "note": "Hazel dormice may hibernate for six months or more, depending on weather and food.",
           "source": "https://www.wildlifetrusts.org/wildlife-explorer/mammals/hazel-dormouse"
         }
-      ]
+      ],
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "logos",
@@ -431,7 +439,9 @@ window.QUIZ = {
           }
         }
       ],
-      "layout": "gallery"
+      "layout": "gallery",
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "dogs",
@@ -505,7 +515,9 @@ window.QUIZ = {
           "note": "The Newfoundland is built for swimming, hauling nets and rescuing people from water.",
           "source": "https://www.akc.org/dog-breeds/newfoundland/"
         }
-      ]
+      ],
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "geography",
@@ -600,7 +612,9 @@ window.QUIZ = {
           }
         }
       ],
-      "layout": "gallery"
+      "layout": "gallery",
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "lyrics",
@@ -674,7 +688,9 @@ window.QUIZ = {
           "note": "'This Ain't a Scene, It's an Arms Race' was a 2007 worldwide hit.",
           "source": "https://www.officialcharts.com/artist/11944/fall-out-boy/"
         }
-      ]
+      ],
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "birds",
@@ -769,7 +785,9 @@ window.QUIZ = {
           }
         }
       ],
-      "layout": "gallery"
+      "layout": "gallery",
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "flags",
@@ -879,7 +897,9 @@ window.QUIZ = {
           }
         }
       ],
-      "layout": "gallery"
+      "layout": "gallery",
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "macro",
@@ -989,7 +1009,9 @@ window.QUIZ = {
           }
         }
       ],
-      "layout": "gallery"
+      "layout": "gallery",
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "secret",
@@ -1082,7 +1104,9 @@ window.QUIZ = {
           "revealText": "They are all hats! Fedora, Panama, Bowler, Trilby and Derby. Derby is the American name for a bowler hat."
         }
       ],
-      "forceMode": "end"
+      "forceMode": "end",
+      "revealNotes": true,
+      "revealHeading": "DID YOU KNOW?"
     },
     {
       "id": "tiebreak",
